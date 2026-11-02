@@ -18,6 +18,7 @@ import {
 import { storageService, AppSettings } from '../services/storageService';
 import { DEFAULT_SERVICES, GUIDE_REFERENCES } from '../data/checklistsData';
 import { ConfirmModal } from './ConfirmModal';
+import { SheetsSyncPanel } from './SheetsSyncPanel';
 import { useToast } from '../context/ToastContext';
 
 interface DataSettingsModalProps {
@@ -177,6 +178,8 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
         )}
         </div>
       </div>
+
+      <SheetsSyncPanel />
 
       {/* Section Mon établissement */}
       <div className="rounded-2xl p-5 sm:p-6 bg-card border border-soft space-y-4 shadow-soft">

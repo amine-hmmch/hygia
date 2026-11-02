@@ -9,6 +9,7 @@ import {
   PeriodiciteAudit,
   ServiceAuditReminder,
 } from '../types';
+import { sheetsService, lignes } from './sheetsService';
 import { DEFAULT_SERVICES, getAllItemsForVersion, getChecklist } from '../data/checklistsData';
 import { validateCycleParameters, PROGRAMMES_GUIDE } from '../data/sterilisationData';
 import { getRecommandation, addDays } from '../data/planActionData';
@@ -377,6 +378,7 @@ export const storageService = {
 
     // Automatically synchronize corrective actions for any item marked "Non"
     this.syncCorrectiveActionsForAudit(completeAudit);
+    sheetsService.enqueue(lignes.audit(completeAudit));
 
     return completeAudit;
   },
@@ -512,6 +514,7 @@ export const storageService = {
     } catch (e) {
       console.error('Failed to save sterilisation cycle', e);
     }
+    sheetsService.enqueue(lignes.sterilisation(completeCycle));
 
     return completeCycle;
   },
@@ -568,6 +571,7 @@ export const storageService = {
     } catch (e) {
       console.error('Failed to save dechet pesee', e);
     }
+    sheetsService.enqueue(lignes.dechets(completePesee));
 
     return completePesee;
   },

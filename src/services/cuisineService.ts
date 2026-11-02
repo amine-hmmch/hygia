@@ -1,3 +1,4 @@
+import { sheetsService, lignes } from './sheetsService';
 export interface CuisineReleve {
   id: string;
   date: string; // YYYY-MM-DD
@@ -56,6 +57,7 @@ export const cuisineService = {
   addReleve(r: Omit<CuisineReleve, 'id' | 'createdAt'>): CuisineReleve {
     const full = { ...r, id: uid(), createdAt: new Date().toISOString() };
     write(CUISINE_RELEVES_KEY, [full, ...read<CuisineReleve>(CUISINE_RELEVES_KEY)]);
+    sheetsService.enqueue(lignes.cuisine(full));
     return full;
   },
   deleteReleve(id: string) {
