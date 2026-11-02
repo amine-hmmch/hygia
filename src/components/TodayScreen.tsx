@@ -58,7 +58,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPla
     alertes.push({ texte: `${prelevAttente.length} prélèvement${prelevAttente.length > 1 ? 's' : ''} en attente de résultat`, onClick: () => onOpenRegistre('prelevements') });
 
   const rapide: { label: string; icon: React.ElementType; onClick: () => void }[] = [
-    { label: 'Chlore', icon: Droplets, onClick: () => onOpenRegistre('eau') },
+    { label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau') },
     { label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements') },
     { label: 'Note', icon: NotebookPen, onClick: onOpenJournal },
     { label: 'Audit', icon: ClipboardCheck, onClick: onNewAudit },
