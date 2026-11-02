@@ -640,8 +640,8 @@ const Fiches: React.FC = () => {
 
 /* ------------------------------- Module ------------------------------- */
 
-export const CuisineModule: React.FC<{ onBackToHome: () => void }> = ({ onBackToHome }) => {
-  const [tab, setTab] = useState<Tab>('releves');
+export const CuisineModule: React.FC<{ onBackToHome: () => void; initialTab?: Tab }> = ({ onBackToHome, initialTab }) => {
+  const [tab, setTab] = useState<Tab>(initialTab ?? 'releves');
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'releves', label: 'Températures', icon: <Thermometer className="w-4 h-4" /> },
     { id: 'audit', label: 'Audit', icon: <ClipboardCheck className="w-4 h-4" /> },

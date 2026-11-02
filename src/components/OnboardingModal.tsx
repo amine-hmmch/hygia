@@ -77,7 +77,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Votre fonction <span className="font-normal text-slate-400">(facultatif)</span> :
+                Votre nom ou fonction <span className="font-normal text-slate-400">(facultatif)</span> :
               </label>
               <input
                 type="text"

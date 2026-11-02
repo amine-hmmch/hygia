@@ -6,41 +6,63 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { BottomNav, NavTab } from './components/BottomNav';
-import { HomeScreen } from './components/HomeScreen';
+import { TodayScreen } from './components/TodayScreen';
+import { TerrainHub, RegistresHub, SuiviHub, PlusHub } from './components/Hubs';
+import { SubScreen } from './components/SubScreen';
 import { AuditRunner } from './components/AuditRunner';
 import { AuditDetailView } from './components/AuditDetailView';
 import { AuditHistory } from './components/AuditHistory';
 import { CorrectiveActionsList } from './components/CorrectiveActionsList';
 import { FichesView } from './components/FichesView';
 import { SterilisationModule } from './components/SterilisationModule';
-import { CuisineModule } from './components/CuisineModule';
 import { DechetsModule } from './components/DechetsModule';
 import { TableauDeBordModule } from './components/TableauDeBordModule';
+import { PlanAnnuelModule } from './components/PlanAnnuelModule';
+import { RegistresModule } from './components/RegistresModule';
+import { JournalModule } from './components/JournalModule';
+import { CuisineModule } from './components/CuisineModule';
+import { RapportMensuelModal } from './components/RapportMensuelModal';
 import { UrgenceAesModal } from './components/UrgenceAesModal';
 import { GlossaireModal } from './components/GlossaireModal';
 import { AProposModal } from './components/AProposModal';
 import { DataSettingsModal } from './components/DataSettingsModal';
-import { ComingSoonModal, ComingSoonTopic } from './components/ComingSoonModal';
 import { TutorialModal } from './components/TutorialModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { storageService } from './services/storageService';
+import { RegistreId } from './data/thmData';
 import { Audit, CorrectiveAction, ChecklistVersion } from './types';
 
-export default function App() {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<NavTab>('accueil');
-  const [currentView, setCurrentView] = useState<
-    'home' | 'runner' | 'detail' | 'sterilisation' | 'dechets' | 'cuisine' | 'tableau_bord'
-  >('home');
+type View =
+  | 'home'
+  | 'runner'
+  | 'detail'
+  | 'sterilisation'
+  | 'dechets'
+  | 'cuisine'
+  | 'plan'
+  | 'registre'
+  | 'journal'
+  | 'tableau_bord'
+  | 'actions'
+  | 'fiches'
+  | 'reglages'
+  | 'historique';
 
-  // Modals state
+const TUTORIAL_KEY = 'essp_hygiene_tutorial_v1';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<NavTab>('accueil');
+  const [currentView, setCurrentView] = useState<View>('home');
+  const [registreId, setRegistreId] = useState<RegistreId>('eau');
+  const [cuisineTab, setCuisineTab] = useState<'releves' | 'audit' | 'fiches'>('releves');
+
   const [isAesOpen, setIsAesOpen] = useState(false);
   const [isGlossaireOpen, setIsGlossaireOpen] = useState(false);
   const [isAProposOpen, setIsAProposOpen] = useState(false);
+  const [isRapportOpen, setIsRapportOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => !storageService.hasCompletedOnboarding());
-
-  const TUTORIAL_KEY = 'essp_hygiene_tutorial_v1';
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+
   const closeTutorial = () => {
     try { localStorage.setItem(TUTORIAL_KEY, 'true'); } catch {}
     setIsTutorialOpen(false);
@@ -51,7 +73,6 @@ export default function App() {
     if (!seen) setIsTutorialOpen(true);
   };
 
-  // Audit data state
   const [audits, setAudits] = useState<Audit[]>([]);
   const [actions, setActions] = useState<CorrectiveAction[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<Audit | null>(null);
@@ -59,15 +80,6 @@ export default function App() {
   const [focusComponent, setFocusComponent] = useState<string | undefined>(undefined);
   const [auditServiceTarget, setAuditServiceTarget] = useState<string | undefined>(undefined);
 
-  // Fiches Category filter state
-  const [fichesCategory, setFichesCategory] = useState<
-    'all' | 'mains' | 'epi' | 'locaux' | 'favoris' | 'tableaux'
-  >('all');
-
-  // Coming soon modal topic
-  const [comingSoonTopic, setComingSoonTopic] = useState<ComingSoonTopic | null>(null);
-
-  // Initial load & seed
   useEffect(() => {
     storageService.seedInitialDataIfEmpty();
     refreshData();
@@ -78,231 +90,230 @@ export default function App() {
     setActions(storageService.getCorrectiveActions());
   };
 
-  // Launch New Audit
-  const handleStartNewAudit = (
-    version: ChecklistVersion = 'courte',
-    compId?: string,
-    defaultService?: string
-  ) => {
+  const go = (view: View) => {
+    setCurrentView(view);
+    window.scrollTo({ top: 0 });
+  };
+  const back = () => go('home');
+
+  const handleStartNewAudit = (version: ChecklistVersion = 'courte', compId?: string, defaultService?: string) => {
     setSelectedAudit(null);
     setAuditVersion(version);
     setFocusComponent(compId);
     setAuditServiceTarget(defaultService);
-    setCurrentView('runner');
+    go('runner');
   };
 
-  // View Audit Details
   const handleViewAudit = (auditId: string) => {
     const found = storageService.getAuditById(auditId);
     if (found) {
       setSelectedAudit(found);
-      setCurrentView('detail');
+      go('detail');
     }
   };
 
-  // Edit Existing Audit
   const handleEditAudit = (audit: Audit) => {
     setSelectedAudit(audit);
     setAuditVersion(audit.version);
     setFocusComponent(undefined);
-    setCurrentView('runner');
+    go('runner');
   };
 
-  // Delete Audit
   const handleDeleteAudit = (auditId: string) => {
     storageService.deleteAudit(auditId);
     refreshData();
     if (selectedAudit?.id === auditId) {
       setSelectedAudit(null);
-      setCurrentView('home');
-      setActiveTab('checklists');
+      setActiveTab('terrain');
+      go('home');
     }
   };
 
-  // Save audit from runner
   const handleSaveAudit = (savedAudit: Audit) => {
     refreshData();
     setSelectedAudit(savedAudit);
-    setCurrentView('detail');
+    go('detail');
   };
 
-  // Open Fiches directly with pre-selected category
-  const handleOpenFiches = (
-    category: 'all' | 'mains' | 'epi' | 'locaux' | 'favoris' | 'tableaux' = 'all'
-  ) => {
-    setFichesCategory(category);
-    setActiveTab('fiches');
-    setCurrentView('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const openRegistre = (id: RegistreId) => {
+    setRegistreId(id);
+    go('registre');
+  };
+  const openCuisine = (tab: 'releves' | 'audit' | 'fiches') => {
+    setCuisineTab(tab);
+    go('cuisine');
   };
 
-  // Open Sterilisation Module directly
-  const handleOpenSterilisation = () => {
-    setCurrentView('sterilisation');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Open Déchets Module directly
-  const handleOpenDechets = () => {
-    setCurrentView('dechets');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleOpenCuisine = () => {
-    setCurrentView('cuisine');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Change tab from bottom bar
   const handleTabChange = (tab: NavTab) => {
-    if (tab === 'fiches') {
-      setFichesCategory('all');
-    }
     setActiveTab(tab);
-    setCurrentView('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    go('home');
   };
 
-  const pendingActionsCount = actions.filter(
-    (a) => a.statut === 'a_faire' || a.statut === 'en_cours'
-  ).length;
+  const pendingActionsCount = actions.filter((a) => a.statut === 'a_faire' || a.statut === 'en_cours').length;
 
-  return (
-    <div className="min-h-screen bg-surface text-main flex flex-col font-body antialiased selection:bg-[#1F5A43] selection:text-white transition-colors duration-200">
-      {/* Header */}
-      <Header
-        onOpenSettings={() => handleTabChange('parametres')}
-        onNewAudit={() => handleStartNewAudit('courte')}
-        onOpenAPropos={() => setIsAProposOpen(true)}
-      />
-
-      {/* Main Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 safe-bottom">
-        {/* VIEW: Running an Audit (Edit or Create) */}
-        {currentView === 'runner' ? (
+  const renderView = () => {
+    switch (currentView) {
+      case 'runner':
+        return (
           <AuditRunner
             initialAudit={selectedAudit}
             defaultVersion={auditVersion}
             defaultService={auditServiceTarget}
             defaultFocusComponent={focusComponent}
             onSave={handleSaveAudit}
-            onCancel={() => {
-              if (selectedAudit) {
-                setCurrentView('detail');
-              } else {
-                setCurrentView('home');
-              }
-            }}
+            onCancel={() => (selectedAudit ? go('detail') : back())}
           />
-        ) : currentView === 'detail' && selectedAudit ? (
-          /* VIEW: Audit Detail / Print / Report */
+        );
+      case 'detail':
+        return selectedAudit ? (
           <AuditDetailView
             audit={selectedAudit}
             onBack={() => {
-              setCurrentView('home');
-              setActiveTab('checklists');
+              setActiveTab('terrain');
+              back();
             }}
             onEdit={handleEditAudit}
             onDelete={handleDeleteAudit}
           />
-        ) : currentView === 'sterilisation' ? (
-          /* VIEW: Sterilisation Module */
-          <SterilisationModule onBackToHome={() => setCurrentView('home')} />
-        ) : currentView === 'dechets' ? (
-          /* VIEW: Déchets (DMP) Module */
-          <DechetsModule onBackToHome={() => setCurrentView('home')} />
-        ) : currentView === 'cuisine' ? (
-          <CuisineModule onBackToHome={() => setCurrentView('home')} />
-        ) : currentView === 'tableau_bord' ? (
-          /* VIEW: Tableau de Bord Sanitaire */
-          <TableauDeBordModule
-            onBackToHome={() => setCurrentView('home')}
-            onOpenChecklists={() => {
-              setActiveTab('checklists');
-              setCurrentView('home');
-            }}
-            onOpenSterilisation={() => setCurrentView('sterilisation')}
-            onOpenDechets={() => setCurrentView('dechets')}
-            onOpenActions={() => {
-              setActiveTab('actions');
-              setCurrentView('home');
+        ) : null;
+      case 'sterilisation':
+        return <SterilisationModule onBackToHome={back} />;
+      case 'dechets':
+        return <DechetsModule onBackToHome={back} />;
+      case 'cuisine':
+        return <CuisineModule onBackToHome={back} initialTab={cuisineTab} />;
+      case 'plan':
+        return (
+          <PlanAnnuelModule
+            onBackToHome={back}
+            onOpenRegistres={() => {
+              setActiveTab('registres');
+              back();
             }}
           />
-        ) : (
-          /* TAB VIEWS */
-          <>
-            {activeTab === 'accueil' && (
-              <HomeScreen
-                audits={audits}
-                actions={actions}
-                onOpenChecklists={() => {
-                  setActiveTab('checklists');
-                  setCurrentView('home');
-                }}
-                onOpenFiches={handleOpenFiches}
-                onOpenSterilisation={handleOpenSterilisation}
-                onOpenDechets={handleOpenDechets}
-                onOpenCuisine={handleOpenCuisine}
-                onOpenUrgenceAes={() => setIsAesOpen(true)}
-                onOpenGlossaire={() => setIsGlossaireOpen(true)}
-                onOpenTableauDeBord={() => setCurrentView('tableau_bord')}
-                onOpenAPropos={() => setIsAProposOpen(true)}
-                onNewAudit={(v, s) => handleStartNewAudit(v || 'courte', undefined, s)}
-                onViewAudit={handleViewAudit}
-                onOpenComingSoon={(topic) => setComingSoonTopic(topic)}
-                onOpenActions={() => {
-                  setActiveTab('actions');
-                  setCurrentView('home');
-                }}
-              />
-            )}
+        );
+      case 'registre':
+        return <RegistresModule registre={registreId} onBack={back} />;
+      case 'journal':
+        return <JournalModule onBackToHome={back} />;
+      case 'tableau_bord':
+        return (
+          <TableauDeBordModule
+            onBackToHome={back}
+            onOpenChecklists={() => go('historique')}
+            onOpenSterilisation={() => go('sterilisation')}
+            onOpenDechets={() => go('dechets')}
+            onOpenActions={() => go('actions')}
+          />
+        );
+      case 'actions':
+        return (
+          <SubScreen title="Actions correctives" onBack={back}>
+            <CorrectiveActionsList actions={actions} onRefresh={refreshData} onViewAudit={handleViewAudit} />
+          </SubScreen>
+        );
+      case 'fiches':
+        return (
+          <SubScreen title="Fiches pratiques" onBack={back}>
+            <FichesView initialCategory="all" onStartAuditWithFocus={(compId) => handleStartNewAudit('courte', compId)} />
+          </SubScreen>
+        );
+      case 'reglages':
+        return (
+          <SubScreen title="Réglages et sauvegarde" onBack={back}>
+            <DataSettingsModal
+              onDataChanged={refreshData}
+              onOpenAPropos={() => setIsAProposOpen(true)}
+              onOpenTutorial={() => setIsTutorialOpen(true)}
+            />
+          </SubScreen>
+        );
+      case 'historique':
+        return (
+          <SubScreen title="Historique des audits" onBack={back}>
+            <AuditHistory
+              audits={audits}
+              onNewAudit={(v) => handleStartNewAudit(v || 'courte')}
+              onViewAudit={handleViewAudit}
+              onEditAudit={handleEditAudit}
+              onDeleteAudit={handleDeleteAudit}
+            />
+          </SubScreen>
+        );
+      default:
+        break;
+    }
 
-            {activeTab === 'checklists' && (
-              <AuditHistory
-                audits={audits}
-                onNewAudit={(v) => handleStartNewAudit(v || 'courte')}
-                onViewAudit={handleViewAudit}
-                onEditAudit={handleEditAudit}
-                onDeleteAudit={handleDeleteAudit}
-              />
-            )}
+    switch (activeTab) {
+      case 'terrain':
+        return (
+          <TerrainHub
+            nbAudits={audits.length}
+            onAuditRapide={() => handleStartNewAudit('courte')}
+            onAuditComplet={() => handleStartNewAudit('exhaustive')}
+            onCuisine={() => openCuisine('audit')}
+            onHistorique={() => go('historique')}
+          />
+        );
+      case 'registres':
+        return (
+          <RegistresHub
+            onJournal={() => go('journal')}
+            onRegistre={openRegistre}
+            onSterilisation={() => go('sterilisation')}
+            onDechets={() => go('dechets')}
+            onCuisine={() => openCuisine('releves')}
+          />
+        );
+      case 'suivi':
+        return (
+          <SuiviHub
+            nbActions={pendingActionsCount}
+            onPlan={() => go('plan')}
+            onActions={() => go('actions')}
+            onRapport={() => setIsRapportOpen(true)}
+            onTableauBord={() => go('tableau_bord')}
+          />
+        );
+      case 'plus':
+        return (
+          <PlusHub
+            onFiches={() => go('fiches')}
+            onGlossaire={() => setIsGlossaireOpen(true)}
+            onAes={() => setIsAesOpen(true)}
+            onReglages={() => go('reglages')}
+            onTutoriel={() => setIsTutorialOpen(true)}
+            onAPropos={() => setIsAProposOpen(true)}
+          />
+        );
+      default:
+        return (
+          <TodayScreen
+            actions={actions}
+            onOpenJournal={() => go('journal')}
+            onOpenPlan={() => go('plan')}
+            onOpenRegistre={openRegistre}
+            onNewAudit={() => handleStartNewAudit('courte')}
+            onOpenActions={() => go('actions')}
+          />
+        );
+    }
+  };
 
-            {activeTab === 'fiches' && (
-              <FichesView
-                initialCategory={fichesCategory}
-                onStartAuditWithFocus={(compId) => handleStartNewAudit('courte', compId)}
-              />
-            )}
+  return (
+    <div className="min-h-screen bg-surface text-main flex flex-col font-body antialiased selection:bg-[#1F5A43] selection:text-white transition-colors duration-200">
+      <Header
+        onOpenSettings={() => go('reglages')}
+        onNewAudit={() => handleStartNewAudit('courte')}
+        onOpenAPropos={() => setIsAProposOpen(true)}
+      />
 
-            {activeTab === 'actions' && (
-              <CorrectiveActionsList
-                actions={actions}
-                onRefresh={refreshData}
-                onViewAudit={handleViewAudit}
-              />
-            )}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 safe-bottom">{renderView()}</main>
 
-            {activeTab === 'parametres' && (
-              <DataSettingsModal
-                onDataChanged={refreshData}
-                onOpenAPropos={() => setIsAProposOpen(true)}
-                onOpenTutorial={() => setIsTutorialOpen(true)}
-              />
-            )}
-          </>
-        )}
-      </main>
-
-      {/* Urgence AES Modal */}
       <UrgenceAesModal isOpen={isAesOpen} onClose={() => setIsAesOpen(false)} />
-
-      {/* Glossaire Modal */}
       <GlossaireModal isOpen={isGlossaireOpen} onClose={() => setIsGlossaireOpen(false)} />
-
-      {/* A Propos Modal */}
       <AProposModal isOpen={isAProposOpen} onClose={() => setIsAProposOpen(false)} />
-
-      {/* Onboarding First Launch Modal */}
+      <RapportMensuelModal isOpen={isRapportOpen} onClose={() => setIsRapportOpen(false)} />
       <OnboardingModal
         isOpen={isOnboardingOpen}
         onComplete={() => {
@@ -311,26 +322,10 @@ export default function App() {
           openTutorialIfFirstTime();
         }}
       />
-
       <TutorialModal isOpen={isTutorialOpen} onClose={closeTutorial} />
 
-      {/* Coming Soon Modal */}
-      <ComingSoonModal
-        topic={comingSoonTopic}
-        onClose={() => setComingSoonTopic(null)}
-        onStartAuditWithFocus={(compId) => {
-          setComingSoonTopic(null);
-          handleStartNewAudit('courte', compId);
-        }}
-      />
-
-      {/* Bottom Navigation */}
       {currentView !== 'runner' && (
-        <BottomNav
-          activeTab={activeTab}
-          onChangeTab={handleTabChange}
-          pendingActionsCount={pendingActionsCount}
-        />
+        <BottomNav activeTab={activeTab} onChangeTab={handleTabChange} pendingActionsCount={pendingActionsCount} />
       )}
     </div>
   );

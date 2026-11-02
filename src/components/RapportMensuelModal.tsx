@@ -6,6 +6,8 @@ import { cuisineService } from '../services/cuisineService';
 import { getChecklist } from '../data/checklistsData';
 import { PRIORITE_LABEL } from '../data/planActionData';
 import { APP_NAME } from '../config/app';
+import { thmService } from '../services/thmService';
+import { REGISTRES, RegistreId } from '../data/thmData';
 
 interface Props {
   isOpen: boolean;
@@ -29,6 +31,7 @@ const Empty: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultMonth }) => {
   const [month, setMonth] = useState(defaultMonth || new Date().toISOString().slice(0, 7));
+  const [periode, setPeriode] = useState<'mois' | 'trimestre'>('mois');
 
   useEffect(() => {
     if (!isOpen) return;
@@ -38,7 +41,26 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
 
   const data = useMemo(() => {
     if (!isOpen) return null;
-    const inMonth = (d?: string) => !!d && d.startsWith(month);
+    const an = parseInt(month.slice(0, 4), 10);
+    const m0 = parseInt(month.slice(5, 7), 10) - 1;
+    const debut = periode === 'mois' ? m0 : Math.floor(m0 / 3) * 3;
+    const mois0 = periode === 'mois' ? [m0] : [debut, debut + 1, debut + 2];
+    const prefixes = mois0.map((x) => `${an}-${String(x + 1).padStart(2, '0')}`);
+    const inMonth = (d?: string) => !!d && prefixes.some((pf) => d.startsWith(pf));
+    const plan = thmService.getPlan(an);
+    const planLignes = plan.activites
+      .map((a) => ({
+        axe: a.axe,
+        titre: a.titre,
+        prevu: mois0.reduce((t, x) => t + (a.prevu[x] || 0), 0),
+        fait: mois0.reduce((t, x) => t + thmService.realise(a, an, x), 0),
+      }))
+      .filter((l) => l.prevu > 0 || l.fait > 0);
+    const registres = REGISTRES.map((def) => {
+      const lignes = thmService.getRegistre(def.id as RegistreId).filter((e) => inMonth(e.date));
+      return { id: def.id, titre: def.titre, n: lignes.length, nc: lignes.filter((e) => def.conforme?.(e) === false).length };
+    });
+    const journalJours = Object.keys(thmService.getJours()).filter((d) => inMonth(d));
     const audits = storageService.getAudits().filter((a) => inMonth(a.date));
     const allActions = storageService.getCorrectiveActions();
     const today = new Date().toISOString().split('T')[0];
@@ -68,6 +90,9 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
     pesees.forEach((p) => (parCategorie[p.categorieLabel] = (parCategorie[p.categorieLabel] || 0) + (p.poidsKg || 0)));
 
     return {
+      planLignes,
+      registres,
+      nbJournal: journalJours.length,
       audits,
       score: audits.length ? Math.round(audits.reduce((s, a) => s + a.scoreGlobal, 0) / audits.length) : null,
       rubriques,
@@ -84,12 +109,14 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
       relevesNc: releves.filter((r) => !r.conforme),
       auditsCuisine,
     };
-  }, [isOpen, month]);
+  }, [isOpen, month, periode]);
 
   if (!isOpen || !data) return null;
   const settings = storageService.getSettings();
   const [y, m] = month.split('-');
-  const titreMois = `${MOIS[parseInt(m, 10) - 1]} ${y}`;
+  const m0n = parseInt(m, 10) - 1;
+  const titreMois =
+    periode === 'mois' ? `${MOIS[m0n]} ${y}` : `${Math.floor(m0n / 3) + 1}${Math.floor(m0n / 3) === 0 ? 'er' : 'e'} trimestre ${y}`;
   const tone = (n: number) => (n >= 80 ? 'text-success' : n >= 50 ? 'text-warning' : 'text-danger');
 
   const Stat: React.FC<{ label: string; value: string; cls?: string }> = ({ label, value, cls = 'text-main' }) => (
@@ -109,6 +136,15 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
           className="h-10 px-3 rounded-lg border border-medium bg-card text-main text-[15px]"
           aria-label="Mois du rapport"
         />
+        <select
+          value={periode}
+          onChange={(e) => setPeriode(e.target.value as 'mois' | 'trimestre')}
+          className="h-10 px-2 rounded-lg border border-medium bg-card text-main text-[15px]"
+          aria-label="Période"
+        >
+          <option value="mois">Mois</option>
+          <option value="trimestre">Trimestre</option>
+        </select>
         <span className="flex-1" />
         <button
           onClick={() => window.print()}
@@ -123,7 +159,7 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
 
       <div className="report-sheet max-w-3xl mx-auto px-4 py-6 space-y-7">
         <header>
-          <p className="label-caps">{settings.etablissement || APP_NAME} · Rapport mensuel d’hygiène</p>
+          <p className="label-caps">{settings.etablissement || APP_NAME} · {periode === 'mois' ? 'Rapport mensuel' : 'Rapport trimestriel'} d’hygiène</p>
           <h2 className="font-serif-display text-[30px] leading-tight text-main mt-1 capitalize">{titreMois}</h2>
           <p className="text-[13px] text-sub mt-1">
             {settings.userName ? `Établi par ${settings.userName}${settings.userRole ? `, ${settings.userRole}` : ''}` : 'Document interne'}
@@ -141,7 +177,7 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
         </section>
 
         <section>
-          <H n={2}>Audits du mois</H>
+          <H n={2}>Audits de la période</H>
           {data.audits.length === 0 ? (
             <Empty>Aucun audit ce mois-ci.</Empty>
           ) : (
@@ -259,6 +295,39 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
               ))}
             </>
           )}
+        </section>
+
+        <section>
+          <H n={7}>Réalisation du plan d’action annuel</H>
+          {data.planLignes.length === 0 ? (
+            <Empty>Aucune activité prévue sur la période.</Empty>
+          ) : (
+            <div className="border-t border-soft">
+              {data.planLignes.map((l, k) => (
+                <div key={k} className="row-rule flex items-center gap-3 py-2 text-[14px]">
+                  <span className="flex-1 min-w-0 text-main">{l.titre}</span>
+                  <span className={`font-mono ${l.fait >= l.prevu ? 'text-success' : 'text-warning'}`}>{l.fait}/{l.prevu}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <H n={8}>Registres et carnet de bord</H>
+          <div className="border-t border-soft">
+            {data.registres.map((r) => (
+              <div key={r.id} className="row-rule flex items-center gap-3 py-2 text-[14px]">
+                <span className="flex-1 text-main">{r.titre}</span>
+                <span className="font-mono text-sub">{r.n} saisie{r.n > 1 ? 's' : ''}</span>
+                <span className={`font-mono w-24 text-end ${r.nc ? 'text-danger' : 'text-success'}`}>{r.nc ? `${r.nc} non conf.` : r.n ? 'conforme' : '—'}</span>
+              </div>
+            ))}
+            <div className="row-rule flex items-center gap-3 py-2 text-[14px]">
+              <span className="flex-1 text-main">Carnet de bord (jours renseignés)</span>
+              <span className="font-mono text-sub">{data.nbJournal}</span>
+            </div>
+          </div>
         </section>
 
         <footer className="pt-6 grid grid-cols-2 gap-8 text-[12px] text-sub">

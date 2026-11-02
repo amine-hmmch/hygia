@@ -12,6 +12,7 @@ import {
 import { DEFAULT_SERVICES, getAllItemsForVersion, getChecklist } from '../data/checklistsData';
 import { validateCycleParameters, PROGRAMMES_GUIDE } from '../data/sterilisationData';
 import { getRecommandation, addDays } from '../data/planActionData';
+import { thmService } from './thmService';
 import { CUISINE_RELEVES_KEY, CUISINE_AUDITS_KEY, cuisineService } from './cuisineService';
 
 const AUDITS_STORAGE_KEY = 'essp_hygiene_audits_v1';
@@ -655,6 +656,7 @@ export const storageService = {
       dechetsPesees: this.getDechetsPesees(),
       cuisineReleves: cuisineService.getReleves(),
       cuisineAudits: cuisineService.getAudits(),
+      thm: thmService.exportAll(),
       services: this.getServices(),
       settings: this.getSettings(),
     };
@@ -686,6 +688,7 @@ export const storageService = {
       if (Array.isArray(data.cuisineAudits)) {
         localStorage.setItem(CUISINE_AUDITS_KEY, JSON.stringify(data.cuisineAudits));
       }
+      if (data.thm) thmService.importAll(data.thm);
       if (Array.isArray(data.services)) {
         localStorage.setItem(SERVICES_STORAGE_KEY, JSON.stringify(data.services));
       }
@@ -717,6 +720,7 @@ export const storageService = {
       localStorage.removeItem(DECHETS_STORAGE_KEY);
       localStorage.removeItem(CUISINE_RELEVES_KEY);
       localStorage.removeItem(CUISINE_AUDITS_KEY);
+      thmService.clearAll();
       localStorage.removeItem(FAVORITES_STORAGE_KEY);
     } catch (e) {
       console.error('Failed to clear data', e);

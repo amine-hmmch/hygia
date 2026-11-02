@@ -18,18 +18,18 @@ interface TutorialModalProps {
 const STEPS = [
   {
     icon: ClipboardCheck,
-    title: 'Auditer un service',
-    text: 'Touche le bouton + en haut à droite, ou « Audit rapide » sur l’accueil. Réponds Oui, Non ou N/A à chaque point. Le score est calculé automatiquement et chaque « Non » peut devenir une action corrective.',
+    title: 'Aujourd’hui et carnet de bord',
+    text: 'L’accueil liste les tâches du jour, ce qu’il faut faire ce mois-ci et les alertes. Coche les tâches dans le Carnet de bord et ajoute des notes par zone : tout est daté et imprimable.',
   },
   {
     icon: BookOpen,
-    title: 'Fiches pratiques',
-    text: 'L’onglet Fiches regroupe les gestes à connaître : hygiène des mains, équipements de protection, entretien des locaux. Ajoute tes fiches préférées en favoris pour les retrouver vite.',
+    title: 'Registres et plan annuel',
+    text: 'Onglet Registres : eau, vecteurs, prélèvements, sensibilisation, stérilisation, déchets. Onglet Suivi : plan d’action annuel (réalisé calculé depuis tes registres), actions correctives et rapport mensuel ou trimestriel.',
   },
   {
     icon: Stethoscope,
-    title: 'Stérilisation et déchets',
-    text: 'Enregistre chaque cycle d’autoclave et chaque pesée de déchets. L’application signale les anomalies et garde l’historique. Le tableau de bord résume tout par mois.',
+    title: 'Terrain : audits',
+    text: 'Onglet Terrain : audit rapide ou complet, audit cuisine. Réponds Oui, Non ou N/A ; chaque « Non » devient une action corrective avec mesure, source et échéance modifiables. Fiches, glossaire et urgence AES sont dans Plus.',
   },
   {
     icon: ChefHat,

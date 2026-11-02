@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, ClipboardCheck, AlertTriangle, Settings, BookOpen } from 'lucide-react';
+import { Home, ClipboardCheck, NotebookPen, Target, Menu } from 'lucide-react';
 
-export type NavTab = 'accueil' | 'checklists' | 'fiches' | 'actions' | 'parametres';
+export type NavTab = 'accueil' | 'terrain' | 'registres' | 'suivi' | 'plus';
 
 interface BottomNavProps {
   activeTab: NavTab;
@@ -11,11 +11,11 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, pendingActionsCount }) => {
   const tabs = [
-    { id: 'accueil' as NavTab, label: 'Accueil', icon: Home },
-    { id: 'checklists' as NavTab, label: 'Audits', icon: ClipboardCheck },
-    { id: 'fiches' as NavTab, label: 'Fiches', icon: BookOpen },
-    { id: 'actions' as NavTab, label: 'Actions', icon: AlertTriangle, badge: pendingActionsCount },
-    { id: 'parametres' as NavTab, label: 'Réglages', icon: Settings },
+    { id: 'accueil' as NavTab, label: 'Aujourd’hui', icon: Home },
+    { id: 'terrain' as NavTab, label: 'Terrain', icon: ClipboardCheck },
+    { id: 'registres' as NavTab, label: 'Registres', icon: NotebookPen },
+    { id: 'suivi' as NavTab, label: 'Suivi', icon: Target, badge: pendingActionsCount },
+    { id: 'plus' as NavTab, label: 'Plus', icon: Menu },
   ];
 
   return (
