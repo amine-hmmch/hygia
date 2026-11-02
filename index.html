@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function() {
+        // Universal fetch setter patch on Window.prototype and window to prevent browser extensions
+        // (e.g. Urban VPN requests.js) from crashing with "Cannot set property fetch of #<Window> which has only a getter"
+        try {
+          var _origFetch = typeof window !== 'undefined' ? window.fetch : null;
+          var _currentFetch = _origFetch ? _origFetch.bind(window) : function() {};
+
+          function createDescriptor() {
+            return {
+              get: function() {
+                return _currentFetch;
+              },
+              set: function(fn) {
+                _currentFetch = fn;
+              },
+              configurable: true,
+              enumerable: true
+            };
+          }
+
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            try {
+              Object.defineProperty(Window.prototype, 'fetch', createDescriptor());
+            } catch (e) {}
+          }
+
+          if (typeof window !== 'undefined') {
+            try {
+              Object.defineProperty(window, 'fetch', createDescriptor());
+            } catch (e) {}
+
+            try {
+              if (window.__proto__) {
+                Object.defineProperty(window.__proto__, 'fetch', createDescriptor());
+              }
+            } catch (e) {}
+          }
+        } catch (e) {}
+
+        // Global error suppression for external chrome-extensions
+        var isExtensionError = function(filename, msg, err) {
+          if (filename && (filename.indexOf('chrome-extension:') !== -1 || filename.indexOf('eppiocemhmnlbhjplcgkofciiegomcon') !== -1)) return true;
+          if (msg && typeof msg === 'string' && (msg.indexOf('chrome-extension:') !== -1 || (msg.indexOf('fetch') !== -1 && msg.indexOf('getter') !== -1))) return true;
+          if (err && err.stack && (err.stack.indexOf('chrome-extension:') !== -1 || err.stack.indexOf('eppiocemhmnlbhjplcgkofciiegomcon') !== -1)) return true;
+          return false;
+        };
+
+        var origOnError = window.onerror;
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+          if (isExtensionError(url, msg, error)) {
+            return true; // Suppress from bubbling and logging
+          }
+          if (typeof origOnError === 'function') {
+            return origOnError.apply(this, arguments);
+          }
+        };
+
+        window.addEventListener('error', function(e) {
+          if (isExtensionError(e.filename, e.message, e.error)) {
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(e) {
+          var reason = e ? e.reason : null;
+          var msg = reason ? (reason.message || String(reason)) : '';
+          var stack = reason ? reason.stack : '';
+          if (isExtensionError(stack, msg, reason)) {
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+          }
+        }, true);
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>SaniESSP – Sécurité Sanitaire ESSP</title>
+    <meta name="description" content="Application professionnelle d'audit et suivi de la sécurité sanitaire des ESSP (Ministère de la Santé, Maroc) - Check-lists, stérilisation et gestion des déchets." />
+    <meta property="og:title" content="SaniESSP – Sécurité Sanitaire ESSP" />
+    <meta property="og:description" content="Application professionnelle d'audit et suivi de la sécurité sanitaire des ESSP - Check-lists, stérilisation et gestion des déchets." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- PWA & Mobile Web App settings -->
+    <meta name="theme-color" content="#FAFAF7" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SaniESSP" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
+
+    <!-- Google Fonts: Fraunces (Headings/Numerals), Inter (Body & UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-surface text-main antialiased selection:bg-teal-600 selection:text-white min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

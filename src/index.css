@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+:root {
+  /* Design Tokens - Light Mode (Default) */
+  --color-primary: #0B6B5C;
+  --color-primary-hover: #085448;
+  --color-primary-tint: #E8F3F1;
+
+  --color-highlight: #E9B44C;
+  --color-highlight-hover: #DDA336;
+  --color-highlight-tint: #FDF6E8;
+
+  --color-success: #16A34A;
+  --color-success-tint: #F0FDF4;
+  --color-success-border: #DCFCE7;
+
+  --color-warning: #D97706;
+  --color-warning-tint: #FFFBEB;
+  --color-warning-border: #FEF3C7;
+
+  --color-danger: #DC2626;
+  --color-danger-tint: #FEF2F2;
+  --color-danger-border: #FEE2E2;
+
+  --color-bg: #FAFAF7;
+  --color-card: #FFFFFF;
+  --color-card-subtle: #F4F4F0;
+  --color-card-hover: #F8F8F5;
+
+  --color-text-main: #1A1A1A;
+  --color-text-sub: #595959;
+  --color-text-muted: #767676;
+
+  --color-border-soft: #E5E5DF;
+  --color-border-medium: #D1D1C7;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-floating: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  /* Design Tokens - Dark Mode (Soft, Low-Contrast, Non-Neon) */
+  --color-primary: #2BA08E;
+  --color-primary-hover: #36B5A1;
+  --color-primary-tint: #142824;
+
+  --color-highlight: #E9B44C;
+  --color-highlight-hover: #F2C366;
+  --color-highlight-tint: #2B2110;
+
+  --color-success: #22C55E;
+  --color-success-tint: #132A1C;
+  --color-success-border: #1E3D29;
+
+  --color-warning: #F59E0B;
+  --color-warning-tint: #2B2110;
+  --color-warning-border: #3D2F17;
+
+  --color-danger: #EF4444;
+  --color-danger-tint: #2D1414;
+  --color-danger-border: #441E1E;
+
+  --color-bg: #141716;
+  --color-card: #1C2220;
+  --color-card-subtle: #232B28;
+  --color-card-hover: #26302C;
+
+  --color-text-main: #EFEFEF;
+  --color-text-sub: #9EABA7;
+  --color-text-muted: #6E7C77;
+
+  --color-border-soft: #2A3430;
+  --color-border-medium: #374440;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.28);
+  --shadow-floating: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    color: var(--color-text-main);
+    background-color: var(--color-bg);
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Fraunces', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-feature-settings: "opsz" 32;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
+    line-height: 1.5;
+    font-size: 15px;
+  }
+}
+
+/* Custom Semantic Utility Classes */
+.bg-surface {
+  background-color: var(--color-bg);
+}
+
+.bg-card {
+  background-color: var(--color-card);
+}
+
+.bg-card-subtle {
+  background-color: var(--color-card-subtle);
+}
+
+.text-main {
+  color: var(--color-text-main);
+}
+
+.text-sub {
+  color: var(--color-text-sub);
+}
+
+.text-muted-custom {
+  color: var(--color-text-muted);
+}
+
+.border-soft {
+  border-color: var(--color-border-soft);
+}
+
+.border-medium {
+  border-color: var(--color-border-medium);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-card);
+}
+
+.shadow-hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.shadow-floating {
+  box-shadow: var(--shadow-floating);
+}
+
+/* Safe area padding for notch and bottom bar */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5rem);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Short subtle animation discipline (150-200ms) */
+* {
+  transition-duration: 150ms;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles for official Morocco Ministry of Health formatted report */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-card {
+    border: 1px solid #d1d1c7 !important;
+    break-inside: avoid;
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+/* User-provided PNG icons rendered via CSS mask with currentColor */
+.icon-mask-hygiene {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask: url(/icons/icon-hygiene-mains.png) center / contain no-repeat;
+  mask: url(/icons/icon-hygiene-mains.png) center / contain no-repeat;
+}
+
+.icon-mask-sterilisation {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask: url(/icons/icon-sterilisation.png) center / contain no-repeat;
+  mask: url(/icons/icon-sterilisation.png) center / contain no-repeat;
+}

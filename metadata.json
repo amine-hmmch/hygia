@@ -1,0 +1,8 @@
+{
+  "name": "ESSP Sécurité Sanitaire",
+  "description": "Application mobile pour le suivi et l'évaluation de la sécurité sanitaire des ESSP (Ministère de la Santé, Maroc 2021) - Check-lists, scores et actions correctives hors-ligne.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
