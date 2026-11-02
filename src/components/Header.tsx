@@ -10,19 +10,25 @@ interface HeaderProps {
   onOpenSettings: () => void;
   onNewAudit: () => void;
   onOpenAPropos?: () => void;
+  onGoHome?: () => void;
 }
 
 const ghostBtn =
   'w-10 h-10 rounded-lg flex items-center justify-center text-sub hover:text-main hover:bg-card-subtle transition active:scale-95';
 
-export const Header: React.FC<HeaderProps> = ({ onNewAudit, onOpenAPropos }) => {
+export const Header: React.FC<HeaderProps> = ({ onNewAudit, onOpenAPropos, onGoHome }) => {
   const isOnline = useOnlineStatus();
   const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="sticky top-0 z-30 bg-surface border-b border-soft px-4 py-2.5 no-print">
       <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0">
+        <button
+          type="button"
+          onClick={onGoHome}
+          aria-label="Retour à l’accueil"
+          className="flex items-center gap-2.5 min-w-0 text-start rounded-lg -ms-1 ps-1 pe-2 py-1 active:opacity-70"
+        >
           <AppLogo size={28} className="shrink-0" />
           <div className="min-w-0 leading-tight">
             <h1 className="text-[17px] font-semibold text-main truncate">{APP_NAME}</h1>
@@ -33,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ onNewAudit, onOpenAPropos }) => 
               </span>
             )}
           </div>
-        </div>
+        </button>
 
         <div className="flex items-center gap-0.5 shrink-0">
           <button

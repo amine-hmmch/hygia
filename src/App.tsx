@@ -306,6 +306,7 @@ export default function App() {
         onOpenSettings={() => go('reglages')}
         onNewAudit={() => handleStartNewAudit('courte')}
         onOpenAPropos={() => setIsAProposOpen(true)}
+        onGoHome={() => handleTabChange('accueil')}
       />
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 safe-bottom">{renderView()}</main>
