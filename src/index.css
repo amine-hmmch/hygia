@@ -1,0 +1,308 @@
+@import "tailwindcss";
+
+/* Le mode sombre suit le bouton de l'application (classe .dark), pas le réglage du téléphone */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Polices embarquées (aucune requête réseau, fonctionnent hors-ligne) */
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+
+/* ------------------------------------------------------------------
+   Identité visuelle : "carnet de terrain"
+   papier chaud, encre, une seule couleur de marque (vert sapin),
+   filets fins plutôt que cartes ombrées, aucun dégradé.
+------------------------------------------------------------------- */
+@theme {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Rayons plus sobres */
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 10px;
+  --radius-3xl: 12px;
+
+  /* Ombres quasi inexistantes */
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: 0 0 0 1px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 1px 0 rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 1px 0 rgb(0 0 0 / 0.05);
+  --shadow-2xl: 0 2px 0 rgb(0 0 0 / 0.06);
+
+  /* Vert sapin (remplace le turquoise par défaut) */
+  --color-teal-50: #eef4f0;
+  --color-teal-100: #dde9e1;
+  --color-teal-200: #bdd4c5;
+  --color-teal-300: #8fb7a0;
+  --color-teal-400: #5fa07f;
+  --color-teal-500: #3c7f5f;
+  --color-teal-600: #2a6a4b;
+  --color-teal-700: #1f5a43;
+  --color-teal-800: #174835;
+  --color-teal-900: #11382a;
+  --color-teal-950: #0a2219;
+
+  /* Ambre et vert un peu plus profonds : texte lisible (AA) sur fond clair */
+  --color-amber-600: #9a5b08;
+  --color-amber-700: #7c4807;
+  --color-emerald-600: #0b7a55;
+  --color-emerald-700: #086447;
+
+  /* Rouge brique (remplace le rose vif) */
+  --color-rose-50: #fbeeea;
+  --color-rose-100: #f6dcd5;
+  --color-rose-200: #eebfb3;
+  --color-rose-300: #e49b8a;
+  --color-rose-400: #d77360;
+  --color-rose-500: #c5523b;
+  --color-rose-600: #a8321f;
+  --color-rose-700: #8a2819;
+  --color-rose-800: #6e2014;
+  --color-rose-900: #54190f;
+  --color-rose-950: #330d08;
+  --color-red-400: #d9705b;
+  --color-red-500: #c9503a;
+  --color-red-600: #b3361f;
+  --color-red-700: #962b19;
+
+  /* Gris chauds (remplacent les gris bleutés) */
+  --color-slate-50: #faf8f3;
+  --color-slate-100: #f1eee6;
+  --color-slate-200: #e2ded3;
+  --color-slate-300: #cdc8bb;
+  --color-slate-400: #a19c90;
+  --color-slate-500: #77736a;
+  --color-slate-600: #5a5750;
+  --color-slate-700: #44423c;
+  --color-slate-800: #2d2c28;
+  --color-slate-900: #1d1d1a;
+  --color-slate-950: #121210;
+}
+
+:root {
+  --color-primary: #1f5a43;
+  --color-primary-hover: #174835;
+  --color-primary-tint: #e6eee8;
+
+  --color-highlight: #8a5a12;
+  --color-highlight-hover: #9a6516;
+  --color-highlight-tint: #f8efdc;
+
+  --color-success: #2f7d4f;
+  --color-success-tint: #e8f1ea;
+  --color-success-border: #c9ddce;
+
+  --color-warning: #8a5a12;
+  --color-warning-tint: #f8efdc;
+  --color-warning-border: #ecd9ae;
+
+  --color-danger: #a8321f;
+  --color-danger-tint: #f9e9e4;
+  --color-danger-border: #e6bdb2;
+
+  --color-bg: #f5f2eb;
+  --color-card: #fbfaf6;
+  --color-card-subtle: #efebe2;
+  --color-card-hover: #f2efe7;
+
+  --color-text-main: #1b1f1c;
+  --color-text-sub: #565b54;
+  --color-text-muted: #62665e;
+
+  --color-border-soft: #dcd7ca;
+  --color-border-medium: #c4bfb1;
+
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-floating: none;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-primary: #62b690;
+  --color-primary-hover: #7cc7a5;
+  --color-primary-tint: #1b2a23;
+
+  --color-highlight: #e0a64a;
+  --color-highlight-hover: #ebb863;
+  --color-highlight-tint: #2b2212;
+
+  --color-success: #62b690;
+  --color-success-tint: #17261e;
+  --color-success-border: #28402f;
+
+  --color-warning: #e0a64a;
+  --color-warning-tint: #2b2212;
+  --color-warning-border: #43341a;
+
+  --color-danger: #ee7b66;
+  --color-danger-tint: #2e1a16;
+  --color-danger-border: #4d2a22;
+
+  --color-bg: #141614;
+  --color-card: #1c1f1d;
+  --color-card-subtle: #232724;
+  --color-card-hover: #272c28;
+
+  --color-text-main: #ecebe6;
+  --color-text-sub: #a5a9a1;
+  --color-text-muted: #8c908a;
+
+  --color-border-soft: #2d322e;
+  --color-border-medium: #3d433e;
+
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-floating: none;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    color: var(--color-text-main);
+    background-color: var(--color-bg);
+    font-size: 16px;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+
+  .font-display {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
+    line-height: 1.5;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Classes sémantiques */
+.bg-surface { background-color: var(--color-bg); }
+.bg-card { background-color: var(--color-card); }
+.bg-card-subtle { background-color: var(--color-card-subtle); }
+.text-main { color: var(--color-text-main); }
+.text-sub { color: var(--color-text-sub); }
+.text-muted-custom { color: var(--color-text-muted); }
+.border-soft { border-color: var(--color-border-soft); }
+.border-medium { border-color: var(--color-border-medium); }
+.shadow-soft, .shadow-hover, .shadow-floating { box-shadow: none; }
+
+/* Couleurs sémantiques (suivent automatiquement le mode clair/sombre) */
+@utility bg-primary { background-color: var(--color-primary); }
+@utility bg-primary-hover { background-color: var(--color-primary-hover); }
+@utility bg-primary-tint { background-color: var(--color-primary-tint); }
+@utility text-primary { color: var(--color-primary); }
+@utility border-primary { border-color: var(--color-primary); }
+@utility bg-danger { background-color: var(--color-danger); }
+@utility bg-danger-tint { background-color: var(--color-danger-tint); }
+@utility text-danger { color: var(--color-danger); }
+@utility border-danger { border-color: var(--color-danger); }
+@utility border-danger-soft { border-color: var(--color-danger-border); }
+@utility bg-warning-tint { background-color: var(--color-warning-tint); }
+@utility text-warning { color: var(--color-warning); }
+@utility text-success { color: var(--color-success); }
+@utility bg-success-tint { background-color: var(--color-success-tint); }
+
+/* Petites étiquettes en capitales, façon formulaire */
+.label-caps {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Ligne de liste avec filet de séparation */
+.row-rule + .row-rule { border-top: 1px solid var(--color-border-soft); }
+
+/* Safe area padding for notch and bottom bar */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Short subtle animation discipline (150-200ms) */
+* {
+  transition-duration: 150ms;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles for official Morocco Ministry of Health formatted report */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-card {
+    border: 1px solid #d1d1c7 !important;
+    break-inside: avoid;
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+/* User-provided PNG icons rendered via CSS mask with currentColor */
+
+/* Icônes : un seul graisse de trait pour toute l'application */
+svg.lucide { stroke-width: 1.7; }
