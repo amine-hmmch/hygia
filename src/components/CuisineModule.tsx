@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { TrendChart } from './TrendChart';
 import {
   ArrowLeft,
   ChefHat,
@@ -53,6 +54,10 @@ const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, 
 const Releves: React.FC = () => {
   const { showToast } = useToast();
   const [releves, setReleves] = useState<CuisineReleve[]>(() => cuisineService.getReleves());
+  const premierPoint = POINTS_CONTROLE.find((p) => cuisineService.getReleves().some((r) => r.pointId === p.id))?.id || POINTS_CONTROLE[0].id;
+  const [graphPointRaw, setGraphPoint] = useState(premierPoint);
+  const graphPoint = POINTS_CONTROLE.some((p) => p.id === graphPointRaw && releves.some((r) => r.pointId === p.id)) ? graphPointRaw : premierPoint;
+  const graphDef = POINTS_CONTROLE.find((p) => p.id === graphPoint);
   const [open, setOpen] = useState(false);
   const [pointId, setPointId] = useState(POINTS_CONTROLE[0].id);
   const [valeur, setValeur] = useState('');
@@ -194,6 +199,28 @@ const Releves: React.FC = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {releves.length > 0 && (
+        <section className="space-y-2 no-print">
+          <select
+            value={graphPoint}
+            onChange={(e) => setGraphPoint(e.target.value)}
+            aria-label="Point à afficher en courbe"
+            className="w-full h-10 px-2 rounded-lg border border-medium bg-card text-main text-[14px]"
+          >
+            {POINTS_CONTROLE.filter((p) => releves.some((r) => r.pointId === p.id)).map((p) => (
+              <option key={p.id} value={p.id}>{p.label}</option>
+            ))}
+          </select>
+          <TrendChart
+            titre="Température"
+            unite="°C"
+            donnees={releves.filter((r) => r.pointId === graphPoint).map((r) => ({ date: r.date, y: r.valeur, groupe: r.pointLabel, ok: r.conforme }))}
+            seuilMax={graphDef?.sens === 'max' ? graphDef.limite : undefined}
+            seuilMin={graphDef?.sens === 'min' ? graphDef.limite : undefined}
+          />
+        </section>
       )}
 
       <section>

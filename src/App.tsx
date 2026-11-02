@@ -29,6 +29,7 @@ import { DataSettingsModal } from './components/DataSettingsModal';
 import { TutorialModal } from './components/TutorialModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { storageService } from './services/storageService';
+import { extrasService } from './services/extrasService';
 import { RegistreId } from './data/thmData';
 import { Audit, CorrectiveAction, ChecklistVersion } from './types';
 
@@ -83,6 +84,7 @@ export default function App() {
   useEffect(() => {
     storageService.seedInitialDataIfEmpty();
     refreshData();
+    void extrasService.notifierRappels();
   }, []);
 
   const refreshData = () => {
@@ -91,6 +93,7 @@ export default function App() {
   };
 
   const go = (view: View) => {
+    refreshData();
     setCurrentView(view);
     window.scrollTo({ top: 0 });
   };
@@ -295,6 +298,7 @@ export default function App() {
             onOpenRegistre={openRegistre}
             onNewAudit={() => handleStartNewAudit('courte')}
             onOpenActions={() => go('actions')}
+            onOpenReglages={() => go('reglages')}
           />
         );
     }

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Check, ChevronRight, Droplets, FlaskConical, NotebookPen, ClipboardCheck, AlertTriangle } from 'lucide-react';
+import { extrasService } from '../services/extrasService';
 import { thmService } from '../services/thmService';
 import { storageService } from '../services/storageService';
 import { CorrectiveAction } from '../types';
@@ -12,6 +13,7 @@ interface Props {
   onOpenRegistre: (id: RegistreId) => void;
   onNewAudit: () => void;
   onOpenActions: () => void;
+  onOpenReglages?: () => void;
 }
 
 const REPERES = [
@@ -27,7 +29,7 @@ const REPERES = [
 const heureMaintenant = () => new Date().toTimeString().slice(0, 5);
 const isoLocal = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
-export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions }) => {
+export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
   const [tick, setTick] = useState(0);
   const settings = storageService.getSettings();
   const userName = settings.userName?.trim();
@@ -54,6 +56,10 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPla
   const alertes: { texte: string; onClick: () => void }[] = [];
   if (retard.length)
     alertes.push({ texte: `${retard.length} action${retard.length > 1 ? 's' : ''} corrective${retard.length > 1 ? 's' : ''} en retard`, onClick: onOpenActions });
+  if (!extrasService.chloreFaitCetteSemaine())
+    alertes.push({ texte: 'Test de chlore de la semaine pas encore fait', onClick: () => onOpenRegistre('eau') });
+  if (extrasService.backupDue() && onOpenReglages)
+    alertes.push({ texte: 'Pense à faire une sauvegarde (plus de 7 jours)', onClick: onOpenReglages });
   if (prelevAttente.length)
     alertes.push({ texte: `${prelevAttente.length} prélèvement${prelevAttente.length > 1 ? 's' : ''} en attente de résultat`, onClick: () => onOpenRegistre('prelevements') });
 

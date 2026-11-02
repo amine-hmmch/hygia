@@ -289,7 +289,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto">
-                    {action.auditId && onViewAudit && action.componentId !== 'cuisine' && (
+                    {action.auditId && onViewAudit && action.componentId !== 'cuisine' && action.componentId !== 'registres' && (
                       <button
                         onClick={() => onViewAudit(action.auditId!)}
                         className="min-h-[36px] px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-[#1F5A43] dark:text-teal-300 hover:bg-teal-100 font-semibold text-xs border border-teal-200 dark:border-teal-800/60 transition dark:hover:bg-teal-900/50"

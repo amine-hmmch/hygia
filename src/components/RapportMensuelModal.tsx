@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Printer, X } from 'lucide-react';
+import { Printer, X, Share2 } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { cuisineService } from '../services/cuisineService';
 import { getChecklist } from '../data/checklistsData';
@@ -117,6 +117,33 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
   const m0n = parseInt(m, 10) - 1;
   const titreMois =
     periode === 'mois' ? `${MOIS[m0n]} ${y}` : `${Math.floor(m0n / 3) + 1}${Math.floor(m0n / 3) === 0 ? 'er' : 'e'} trimestre ${y}`;
+  const partager = async () => {
+    const L: string[] = [
+      `${settings.etablissement || APP_NAME} · ${periode === 'mois' ? 'Rapport mensuel' : 'Rapport trimestriel'} d’hygiène`,
+      titreMois,
+      '',
+      `Audits : ${data.audits.length}${data.score !== null ? ` (score moyen ${data.score} %)` : ''}`,
+      `Actions ouvertes : ${data.ouvertes.length} (dont ${data.enRetard.length} en retard) · clôturées : ${data.cloturees.length}`,
+      `Stérilisation : ${data.cycles.length} cycle(s), ${data.anomalies.length} anomalie(s)`,
+      `Déchets : ${Math.round(data.totalKg * 10) / 10} kg`,
+      `Cuisine : ${data.releves.length} relevé(s), ${data.relevesNc.length} hors limite`,
+      '',
+      'Plan d’action annuel :',
+      ...data.planLignes.map((l) => `- ${l.titre} : ${l.fait}/${l.prevu}`),
+      '',
+      'Registres :',
+      ...data.registres.map((r) => `- ${r.titre} : ${r.n} saisie(s)${r.nc ? `, ${r.nc} non conforme(s)` : ''}`),
+    ];
+    const text = L.join('\n');
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `Rapport ${titreMois}`, text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      window.alert('Résumé copié : colle-le dans un message ou un e-mail.');
+    } catch {}
+  };
   const tone = (n: number) => (n >= 80 ? 'text-success' : n >= 50 ? 'text-warning' : 'text-danger');
 
   const Stat: React.FC<{ label: string; value: string; cls?: string }> = ({ label, value, cls = 'text-main' }) => (
@@ -146,6 +173,9 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
           <option value="trimestre">Trimestre</option>
         </select>
         <span className="flex-1" />
+        <button onClick={partager} aria-label="Partager le résumé" className="h-10 w-10 rounded-lg border border-medium text-main flex items-center justify-center">
+          <Share2 className="w-4 h-4" />
+        </button>
         <button
           onClick={() => window.print()}
           className="h-10 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5"

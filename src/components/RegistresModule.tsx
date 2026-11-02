@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, Trash2, Check, X, Droplets, Bug, FlaskConical, Presentation, Printer } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Check, X, Droplets, Bug, FlaskConical, Presentation, Printer, Download, Copy } from 'lucide-react';
 import { REGISTRES, RegistreDef, RegistreId } from '../data/thmData';
 import { thmService, RegistreEntree } from '../services/thmService';
 import { storageService } from '../services/storageService';
 import { ConfirmModal } from './ConfirmModal';
+import { TrendChart, PointTendance } from './TrendChart';
+import { extrasService } from '../services/extrasService';
+import { addDays } from '../data/planActionData';
+import { CorrectiveAction } from '../types';
 import { useToast } from '../context/ToastContext';
 
 const ICONES: Record<RegistreId, React.ElementType> = {
@@ -17,6 +21,49 @@ const TONES: Record<RegistreId, string> = { eau: 'sea', vecteurs: 'clay', prelev
 const today = () => new Date().toISOString().split('T')[0];
 const nowTime = () => new Date().toTimeString().slice(0, 5);
 const fmt = (d: string) => (d ? d.split('-').reverse().join('/') : '');
+
+/** Une mesure non conforme crée tout de suite une action corrective à suivre. */
+function creerActionAuto(def: RegistreDef, e: RegistreEntree) {
+  const lieu = e.point || e.zone || e.lieu || '';
+  const mesures: Record<string, { mesure: string; source: string; jours: number }> = {
+    eau: {
+      mesure:
+        'Refaire la mesure au même point, contrôler la chloration (dose, pompe, stock de chlore) et purger le point. Si le résultat reste hors limite, interrompre l’usage pour la boisson et informer le responsable.',
+      source: 'NM 03.7.001 (pH) ; repère OMS (chlore résiduel)',
+      jours: 1,
+    },
+    prelevements: {
+      mesure:
+        'Nettoyer et désinfecter le point prélevé (ou chloration choc du réseau), refaire un prélèvement de contrôle, rechercher la cause et informer la direction.',
+      source: 'Résultat d’analyse non conforme',
+      jours: 3,
+    },
+  };
+  const m = mesures[def.id] || {
+    mesure: 'Rechercher la cause de la non-conformité, corriger et vérifier à nouveau.',
+    source: def.titre,
+    jours: 7,
+  };
+  const now = new Date().toISOString();
+  const action: CorrectiveAction = {
+    id: `act_reg_${e.id}`,
+    auditId: `registre_${def.id}`,
+    itemId: `reg_${e.id}`,
+    itemTitle: def.titreLigne(e),
+    componentId: 'registres',
+    componentTitle: def.titre,
+    service: lieu || def.titre,
+    description: m.mesure,
+    responsable: storageService.getSettings().userName || 'Technicien d’hygiène du milieu',
+    echeance: addDays(e.date || today(), m.jours),
+    statut: 'a_faire',
+    createdAt: now,
+    constat: `${def.titre} · ${def.titreLigne(e)} (${fmt(e.date)})`,
+    source: m.source,
+    priorite: m.jours <= 1 ? 'haute' : 'moyenne',
+  };
+  storageService.saveCorrectiveAction(action);
+}
 
 const inputCls =
   'w-full h-11 px-3 rounded-lg border border-medium bg-card text-main text-[15px] focus:outline-none focus:border-primary';
@@ -33,8 +80,18 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
   const Icon = ICONES[def.id];
   const operateurDefaut = storageService.getSettings().userName || '';
 
-  const start = () => {
-    setVals(def.champs.some((c) => c.id === 'operateur') ? { operateur: operateurDefaut } : {});
+  const start = (modele?: RegistreEntree) => {
+    // Saisie rapide : on reprend les champs « fixes » (point, opérateur, type, zone…) de la dernière entrée ou du modèle
+    const base = modele || entrees[0];
+    const v: Record<string, string> = {};
+    if (base) {
+      def.champs.forEach((c) => {
+        if ((c.type === 'text' || c.type === 'select') && base[c.id] !== undefined) v[c.id] = String(base[c.id]);
+        if (modele && c.type !== 'textarea' && base[c.id] !== undefined) v[c.id] = String(base[c.id]);
+      });
+    }
+    if (def.champs.some((c) => c.id === 'operateur') && !v.operateur) v.operateur = operateurDefaut;
+    setVals(v);
     setDate(today());
     setHeure(nowTime());
     setOpen(true);
@@ -49,12 +106,34 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
       const v = (vals[c.id] ?? '').toString().trim();
       if (v !== '') data[c.id] = c.type === 'number' ? v.replace(',', '.') : v;
     });
-    thmService.addEntree(def.id, data as any);
+    const saved = thmService.addEntree(def.id, data as any);
     setEntrees(thmService.getRegistre(def.id));
     setOpen(false);
     const c = def.conforme?.(data);
-    showToast(c === false ? 'Enregistré : non conforme' : 'Enregistré', c === false ? 'warning' : 'success');
+    if (c === false) {
+      creerActionAuto(def, saved);
+      showToast('Non conforme : une action corrective a été créée', 'warning');
+    } else {
+      showToast('Enregistré', 'success');
+    }
   };
+
+  const exporter = () => {
+    const cols = def.champs.filter((c) => c.id !== 'date' && c.id !== 'heure');
+    const rows: (string | number)[][] = [['Date', 'Heure', ...cols.map((c) => c.label), 'Conforme']];
+    entrees.forEach((e) => {
+      const c = def.conforme?.(e);
+      rows.push([e.date, e.heure || '', ...cols.map((x) => (x.type === 'number' && e[x.id] !== undefined ? String(e[x.id]).replace('.', ',') : e[x.id] ?? '')), c === undefined ? '' : c ? 'Oui' : 'Non']);
+    });
+    extrasService.downloadCsv(def.titre.replace(/\s+/g, '_'), rows);
+  };
+
+  const tendanceEau: PointTendance[] =
+    def.id === 'eau'
+      ? entrees
+          .filter((e) => !isNaN(parseFloat(e.chlore)))
+          .map((e) => ({ date: e.date, y: parseFloat(e.chlore), groupe: e.point || 'Point d’eau', ok: def.conforme?.(e) !== false }))
+      : [];
 
   const nc = entrees.filter((e) => def.conforme?.(e) === false).length;
 
@@ -77,7 +156,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
 
       {!open ? (
         <button
-          onClick={start}
+          onClick={() => start()}
           className="w-full h-12 rounded-lg bg-primary text-white dark:text-[#10201a] font-medium flex items-center justify-center gap-2 no-print"
         >
           <Plus className="w-5 h-5" /> Nouvelle entrée
@@ -163,12 +242,19 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
         </div>
       )}
 
+      {def.id === 'eau' && <TrendChart titre="Chlore résiduel libre" unite="mg/L" donnees={tendanceEau} seuilMin={0.2} />}
+
       <section>
         <div className="flex items-baseline justify-between pb-2 border-b border-medium">
           <h3 className="label-caps">
             Historique · {entrees.length}
             {def.conforme && nc > 0 ? ` · ${nc} non conforme${nc > 1 ? 's' : ''}` : ''}
           </h3>
+          {entrees.length > 0 && (
+            <button onClick={exporter} className="text-xs text-sub flex items-center gap-1 no-print me-3">
+              <Download className="w-3.5 h-3.5" /> CSV
+            </button>
+          )}
           {entrees.length > 0 && (
             <button onClick={() => window.print()} className="text-xs text-sub flex items-center gap-1 no-print">
               <Printer className="w-3.5 h-3.5" /> Imprimer
@@ -195,6 +281,9 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
                       {def.sousTitre(e) ? ` · ${def.sousTitre(e)}` : ''}
                     </div>
                   </div>
+                  <button onClick={() => start(e)} className="text-sub p-1 -m-1 no-print" aria-label="Refaire la même saisie" title="Refaire la même saisie">
+                    <Copy className="w-4 h-4" />
+                  </button>
                   <button onClick={() => setToDelete(e.id)} className="text-sub p-1 -m-1 no-print" aria-label="Supprimer">
                     <Trash2 className="w-4 h-4" />
                   </button>
