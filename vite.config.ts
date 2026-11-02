@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { APP_NAME, APP_DESCRIPTION } from './src/config/app';
 
 // Base path : "/" en local, "/<nom-du-depot>/" sur GitHub Pages (défini par le workflow).
 const base = process.env.BASE_PATH || '/';
@@ -31,11 +32,11 @@ export default defineConfig(() => {
         ],
         manifest: {
           id: base,
-          name: 'ESSP Sécurité Sanitaire',
-          short_name: 'ESSP Hygiène',
-          description: "Outil d'aide à l'audit et au suivi de la sécurité sanitaire des établissements de soins (d'après le Guide du Professionnel SSS-ESSP, Maroc 2021)",
-          theme_color: '#0F766E',
-          background_color: '#F7FAFA',
+          name: APP_NAME,
+          short_name: APP_NAME,
+          description: APP_DESCRIPTION,
+          theme_color: '#1F5A43',
+          background_color: '#F5F2EB',
           display: 'standalone',
           orientation: 'portrait',
           start_url: base,
@@ -66,17 +67,6 @@ export default defineConfig(() => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,woff,woff2}'],
           navigateFallback: `${base}index.html`,
           cleanupOutdatedCaches: true,
-          runtimeCaching: [
-            {
-              urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'google-fonts',
-                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-                cacheableResponse: { statuses: [0, 200] },
-              },
-            },
-          ],
         },
         devOptions: {
           enabled: true,

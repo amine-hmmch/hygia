@@ -1,22 +1,21 @@
-# ESSP Sécurité Sanitaire
+# Hygia
 
-Application web installable (PWA), 100 % hors-ligne, d'aide à l'hygiène en établissement de soins :
-check-lists d'audit (tableaux 20 et 21), fiches pratiques, stérilisation, déchets, actions correctives et rapports.
-Basée sur le *Guide du Professionnel – Sécurité Sanitaire des ESSP* (Ministère de la Santé, Maroc, 2021).
+Application web (PWA) d'hygiène en établissement de santé : audits, fiches pratiques,
+stérilisation, déchets, tableau de bord. Fonctionne hors-ligne, installable sur Android.
 
-> Outil d'aide. Il ne remplace pas le guide officiel.
-> Aucune donnée patient ne doit être saisie. Les données restent sur l'appareil (stockage local du navigateur).
+> Outil d'aide. Il ne remplace pas les documents officiels de l'établissement.
 
-## Lancer en local
+## Modules
+- Soins : audits rapides/complets, urgence AES, fiches, stérilisation, déchets, locaux
+- Cuisine et restauration : relevés de température (réception, froid, cuisson, maintien), audit HACCP, fiches pratiques
+
+## Changer le nom
+Modifier `src/config/app.ts` (APP_NAME) et la balise `<title>` de `index.html`.
+
+## Développement
 ```
 npm install
 npm run dev
+npm run build
 ```
-
-## Publier sur GitHub Pages
-1. Poussez ce dossier sur la branche `main` d'un dépôt **public**.
-2. Dans le dépôt : **Settings → Pages → Source : GitHub Actions**.
-3. Le workflow `.github/workflows/deploy.yml` compile et publie automatiquement.
-4. L'application est disponible sur `https://<votre-pseudo>.github.io/<nom-du-depot>/`.
-
-Sur téléphone (Chrome) : ouvrir le lien, puis menu ⋮ → **Installer l'application**.
+Déploiement GitHub Pages : workflow `.github/workflows/deploy.yml` (BASE_PATH automatique).
