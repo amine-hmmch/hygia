@@ -10,6 +10,11 @@ const base = process.env.BASE_PATH || '/';
 export default defineConfig(() => {
   return {
     base,
+    build: {
+      // Compatibilité avec les navigateurs Android plus anciens (évite la page blanche)
+      target: ['chrome80', 'safari13', 'firefox78'],
+      cssTarget: 'chrome80',
+    },
     plugins: [
       react(),
       tailwindcss(),
