@@ -253,7 +253,7 @@
 
 /* Safe area padding for notch and bottom bar */
 .safe-bottom {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.5rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 7rem);
 }
 
 .safe-top {

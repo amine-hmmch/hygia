@@ -10,7 +10,7 @@ interface Props {
   actions: CorrectiveAction[];
   onOpenJournal: () => void;
   onOpenPlan: () => void;
-  onOpenRegistre: (id: RegistreId) => void;
+  onOpenRegistre: (id: RegistreId, auto?: boolean) => void;
   onNewAudit: () => void;
   onOpenActions: () => void;
   onOpenReglages?: () => void;
@@ -57,7 +57,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPla
   if (retard.length)
     alertes.push({ texte: `${retard.length} action${retard.length > 1 ? 's' : ''} corrective${retard.length > 1 ? 's' : ''} en retard`, onClick: onOpenActions });
   if (!extrasService.chloreFaitCetteSemaine())
-    alertes.push({ texte: 'Test de chlore de la semaine pas encore fait', onClick: () => onOpenRegistre('eau') });
+    alertes.push({ texte: 'Test de chlore de la semaine pas encore fait', onClick: () => onOpenRegistre('eau', true) });
   if (extrasService.backupDue() && onOpenReglages)
     alertes.push({ texte: 'Pense à faire une sauvegarde (plus de 7 jours)', onClick: onOpenReglages });
   if (prelevAttente.length)
@@ -65,7 +65,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPla
 
   const rapide: { label: string; icon: React.ElementType; onClick: () => void }[] = [
     { label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau') },
-    { label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements') },
+    { label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements', true) },
     { label: 'Note', icon: NotebookPen, onClick: onOpenJournal },
     { label: 'Audit', icon: ClipboardCheck, onClick: onNewAudit },
   ];

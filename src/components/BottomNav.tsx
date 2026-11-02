@@ -1,19 +1,20 @@
 import React from 'react';
-import { Home, ClipboardCheck, NotebookPen, Target, Menu } from 'lucide-react';
+import { Home, ListChecks, Target, Menu, Plus } from 'lucide-react';
 
-export type NavTab = 'accueil' | 'terrain' | 'registres' | 'suivi' | 'plus';
+export type NavTab = 'accueil' | 'saisir' | 'suivi' | 'plus';
 
 interface BottomNavProps {
   activeTab: NavTab;
   onChangeTab: (tab: NavTab) => void;
+  onAdd: () => void;
   pendingActionsCount: number;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, pendingActionsCount }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, onAdd, pendingActionsCount }) => {
   const tabs = [
     { id: 'accueil' as NavTab, label: 'Aujourd’hui', icon: Home },
-    { id: 'terrain' as NavTab, label: 'Terrain', icon: ClipboardCheck },
-    { id: 'registres' as NavTab, label: 'Registres', icon: NotebookPen },
+    { id: 'saisir' as NavTab, label: 'Saisies', icon: ListChecks },
+    null,
     { id: 'suivi' as NavTab, label: 'Suivi', icon: Target, badge: pendingActionsCount },
     { id: 'plus' as NavTab, label: 'Plus', icon: Menu },
   ];
@@ -24,7 +25,21 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, pe
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="max-w-4xl mx-auto grid grid-cols-5">
-        {tabs.map((tab) => {
+        {tabs.map((tab, i) => {
+          if (!tab) {
+            return (
+              <div key="add" className="relative flex justify-center">
+                <button
+                  onClick={onAdd}
+                  aria-label="Nouvelle saisie"
+                  className="absolute -top-6 w-14 h-14 rounded-full bg-primary text-white dark:text-[#10201a] flex items-center justify-center border-4 border-[var(--color-surface)] shadow-md active:scale-95 transition"
+                >
+                  <Plus className="w-7 h-7" strokeWidth={2.2} />
+                </button>
+                <span className="mt-[38px] pb-1.5 text-[11px] leading-none font-medium text-sub select-none">Saisir</span>
+              </div>
+            );
+          }
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
@@ -37,7 +52,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, pe
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {isActive && <span className="absolute top-0 inset-x-6 h-[2px] bg-primary" />}
+              {isActive && <span className="absolute top-0 inset-x-4 h-[2px] bg-primary" />}
               <span className="relative">
                 <Icon className="w-[22px] h-[22px]" strokeWidth={isActive ? 2.1 : 1.6} />
                 {tab.badge !== undefined && tab.badge > 0 && (
@@ -46,9 +61,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab, pe
                   </span>
                 )}
               </span>
-              <span className={`text-[11px] leading-none ${isActive ? 'font-semibold' : 'font-medium'}`}>
-                {tab.label}
-              </span>
+              <span className={`text-[11px] leading-none ${isActive ? 'font-semibold' : 'font-medium'}`}>{tab.label}</span>
             </button>
           );
         })}

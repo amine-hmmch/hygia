@@ -1,5 +1,5 @@
 import React from 'react';
-import { WifiOff, Info, Sun, Moon, Plus } from 'lucide-react';
+import { WifiOff, Info, Sun, Moon } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
 import { AppLogo } from './AppLogo';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
@@ -8,7 +8,7 @@ import { APP_NAME } from '../config/app';
 
 interface HeaderProps {
   onOpenSettings: () => void;
-  onNewAudit: () => void;
+  onNewAudit?: () => void;
   onOpenAPropos?: () => void;
   onGoHome?: () => void;
 }
@@ -16,7 +16,7 @@ interface HeaderProps {
 const ghostBtn =
   'w-10 h-10 rounded-lg flex items-center justify-center text-sub hover:text-main hover:bg-card-subtle transition active:scale-95';
 
-export const Header: React.FC<HeaderProps> = ({ onNewAudit, onOpenAPropos, onGoHome }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenAPropos, onGoHome }) => {
   const isOnline = useOnlineStatus();
   const { theme, toggleTheme } = useTheme();
 
@@ -58,16 +58,6 @@ export const Header: React.FC<HeaderProps> = ({ onNewAudit, onOpenAPropos, onGoH
           )}
 
           <PWAInstallButton compact={true} />
-
-          <button
-            onClick={onNewAudit}
-            className="ms-1.5 h-10 min-w-10 px-3 rounded-lg flex items-center justify-center gap-1.5 bg-primary text-white dark:text-[#10201a] font-medium text-sm active:scale-95 transition hover:bg-primary-hover"
-            title="Démarrer un nouvel audit"
-            aria-label="Nouvel audit"
-          >
-            <Plus className="w-[18px] h-[18px]" strokeWidth={2.2} />
-            <span className="hidden min-[420px]:inline">Audit</span>
-          </button>
         </div>
       </div>
     </header>

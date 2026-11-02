@@ -7,7 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { BottomNav, NavTab } from './components/BottomNav';
 import { TodayScreen } from './components/TodayScreen';
-import { TerrainHub, RegistresHub, SuiviHub, PlusHub } from './components/Hubs';
+import { SaisirHub, SuiviHub, PlusHub } from './components/Hubs';
+import { QuickAddSheet, AjoutRapide } from './components/QuickAddSheet';
 import { SubScreen } from './components/SubScreen';
 import { AuditRunner } from './components/AuditRunner';
 import { AuditDetailView } from './components/AuditDetailView';
@@ -55,6 +56,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('accueil');
   const [currentView, setCurrentView] = useState<View>('home');
   const [registreId, setRegistreId] = useState<RegistreId>('eau');
+  const [registreAuto, setRegistreAuto] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [cuisineTab, setCuisineTab] = useState<'releves' | 'audit' | 'fiches'>('releves');
 
   const [isAesOpen, setIsAesOpen] = useState(false);
@@ -127,7 +130,7 @@ export default function App() {
     refreshData();
     if (selectedAudit?.id === auditId) {
       setSelectedAudit(null);
-      setActiveTab('terrain');
+      setActiveTab('saisir');
       go('home');
     }
   };
@@ -138,13 +141,24 @@ export default function App() {
     go('detail');
   };
 
-  const openRegistre = (id: RegistreId) => {
+  const openRegistre = (id: RegistreId, auto = false) => {
     setRegistreId(id);
+    setRegistreAuto(auto);
     go('registre');
   };
   const openCuisine = (tab: 'releves' | 'audit' | 'fiches') => {
     setCuisineTab(tab);
     go('cuisine');
+  };
+
+  const pickAjout = (k: AjoutRapide) => {
+    setIsAddOpen(false);
+    if (k === 'eau' || k === 'prelevements' || k === 'vecteurs' || k === 'sensibilisation') return openRegistre(k, true);
+    if (k === 'sterilisation') return go('sterilisation');
+    if (k === 'dechets') return go('dechets');
+    if (k === 'cuisine') return openCuisine('releves');
+    if (k === 'note') return go('journal');
+    handleStartNewAudit('courte');
   };
 
   const handleTabChange = (tab: NavTab) => {
@@ -172,7 +186,7 @@ export default function App() {
           <AuditDetailView
             audit={selectedAudit}
             onBack={() => {
-              setActiveTab('terrain');
+              setActiveTab('saisir');
               back();
             }}
             onEdit={handleEditAudit}
@@ -190,13 +204,13 @@ export default function App() {
           <PlanAnnuelModule
             onBackToHome={back}
             onOpenRegistres={() => {
-              setActiveTab('registres');
+              setActiveTab('saisir');
               back();
             }}
           />
         );
       case 'registre':
-        return <RegistresModule registre={registreId} onBack={back} />;
+        return <RegistresModule registre={registreId} onBack={back} autoOpen={registreAuto} />;
       case 'journal':
         return <JournalModule onBackToHome={back} />;
       case 'tableau_bord':
@@ -248,24 +262,19 @@ export default function App() {
     }
 
     switch (activeTab) {
-      case 'terrain':
+      case 'saisir':
         return (
-          <TerrainHub
+          <SaisirHub
             nbAudits={audits.length}
-            onAuditRapide={() => handleStartNewAudit('courte')}
-            onAuditComplet={() => handleStartNewAudit('exhaustive')}
-            onCuisine={() => openCuisine('audit')}
-            onHistorique={() => go('historique')}
-          />
-        );
-      case 'registres':
-        return (
-          <RegistresHub
             onJournal={() => go('journal')}
-            onRegistre={openRegistre}
+            onRegistre={(id) => openRegistre(id)}
             onSterilisation={() => go('sterilisation')}
             onDechets={() => go('dechets')}
-            onCuisine={() => openCuisine('releves')}
+            onCuisineReleves={() => openCuisine('releves')}
+            onCuisineAudit={() => openCuisine('audit')}
+            onAuditRapide={() => handleStartNewAudit('courte')}
+            onAuditComplet={() => handleStartNewAudit('exhaustive')}
+            onHistorique={() => go('historique')}
           />
         );
       case 'suivi':
@@ -308,7 +317,6 @@ export default function App() {
     <div className="min-h-screen bg-surface text-main flex flex-col font-body antialiased selection:bg-[#1F5A43] selection:text-white transition-colors duration-200">
       <Header
         onOpenSettings={() => go('reglages')}
-        onNewAudit={() => handleStartNewAudit('courte')}
         onOpenAPropos={() => setIsAProposOpen(true)}
         onGoHome={() => handleTabChange('accueil')}
       />
@@ -327,10 +335,11 @@ export default function App() {
           openTutorialIfFirstTime();
         }}
       />
+      <QuickAddSheet isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} onPick={pickAjout} />
       <TutorialModal isOpen={isTutorialOpen} onClose={closeTutorial} />
 
       {currentView !== 'runner' && (
-        <BottomNav activeTab={activeTab} onChangeTab={handleTabChange} pendingActionsCount={pendingActionsCount} />
+        <BottomNav activeTab={activeTab} onChangeTab={handleTabChange} onAdd={() => setIsAddOpen(true)} pendingActionsCount={pendingActionsCount} />
       )}
     </div>
   );

@@ -67,43 +67,24 @@ export const HubHeader: React.FC<{ title: string; subtitle: string }> = ({ title
 
 const ic = 'w-5 h-5';
 
-/* ------------------------------- Terrain ------------------------------- */
+/* ------------------------------- Saisies ------------------------------- */
 
-export const TerrainHub: React.FC<{
-  onAuditRapide: () => void;
-  onAuditComplet: () => void;
-  onCuisine: () => void;
-  onHistorique: () => void;
-  nbAudits: number;
-}> = ({ onAuditRapide, onAuditComplet, onCuisine, onHistorique, nbAudits }) => (
-  <div className="space-y-6 pb-6">
-    <HubHeader title="Terrain" subtitle="Tes supervisions et audits dans les services" />
-    <section>
-      <HubTitle>Grilles de supervision</HubTitle>
-      <HubRow tone="pine" icon={<ClipboardCheck className={ic} />} title="Audit rapide" desc="5 composantes, tableau 20 du guide" onClick={onAuditRapide} />
-      <HubRow tone="sea" icon={<Layers className={ic} />} title="Audit complet" desc="Version détaillée, tableau 21 du guide" onClick={onAuditComplet} />
-      <HubRow tone="ochre" icon={<ChefHat className={ic} />} title="Cuisine et restauration" desc="Supervision HACCP, températures, fiches" onClick={onCuisine} />
-    </section>
-    <section>
-      <HubTitle>Mes audits</HubTitle>
-      <HubRow tone="plum" icon={<ListChecks className={ic} />} title="Historique des audits" desc="Rapports, modification, suppression" meta={String(nbAudits)} onClick={onHistorique} />
-    </section>
-  </div>
-);
-
-/* ------------------------------- Registres ------------------------------- */
-
-export const RegistresHub: React.FC<{
+export const SaisirHub: React.FC<{
   onJournal: () => void;
   onRegistre: (id: RegistreId) => void;
   onSterilisation: () => void;
   onDechets: () => void;
-  onCuisine: () => void;
-}> = ({ onJournal, onRegistre, onSterilisation, onDechets, onCuisine }) => {
+  onCuisineReleves: () => void;
+  onCuisineAudit: () => void;
+  onAuditRapide: () => void;
+  onAuditComplet: () => void;
+  onHistorique: () => void;
+  nbAudits: number;
+}> = ({ onJournal, onRegistre, onSterilisation, onDechets, onCuisineReleves, onCuisineAudit, onAuditRapide, onAuditComplet, onHistorique, nbAudits }) => {
   const n = (id: RegistreId) => String(thmService.getRegistre(id).length);
   return (
     <div className="space-y-6 pb-6">
-      <HubHeader title="Registres" subtitle="Tout ce que tu notes sur le terrain" />
+      <HubHeader title="Saisies" subtitle="Tes registres et tes audits. Pour noter vite, utilise le bouton +" />
       <section>
         <HubTitle>Au quotidien</HubTitle>
         <HubRow tone="pine" icon={<NotebookPen className={ic} />} title="Carnet de bord" desc="Tâches du jour, notes, calendrier" onClick={onJournal} />
@@ -120,12 +101,16 @@ export const RegistresHub: React.FC<{
         <HubRow tone="clay" icon={<Trash2 className={ic} />} title="Déchets de soins" desc="Pesées, tri, évolution mensuelle" onClick={onDechets} />
       </section>
       <section>
-        <HubTitle>Cuisine</HubTitle>
-        <HubRow tone="ochre" icon={<Thermometer className={ic} />} title="Relevés de température" desc="Frigos, réception, cuisson, maintien" onClick={onCuisine} />
+        <HubTitle>Cuisine et formation</HubTitle>
+        <HubRow tone="ochre" icon={<Thermometer className={ic} />} title="Relevés de température" desc="Frigos, réception, cuisson, maintien" onClick={onCuisineReleves} />
+        <HubRow tone="plum" icon={<Presentation className={ic} />} title="Sensibilisation et formation" desc="Séances, thèmes, participants" meta={n('sensibilisation')} onClick={() => onRegistre('sensibilisation')} />
       </section>
       <section>
-        <HubTitle>Formation</HubTitle>
-        <HubRow tone="plum" icon={<Presentation className={ic} />} title="Sensibilisation et formation" desc="Séances, thèmes, participants" meta={n('sensibilisation')} onClick={() => onRegistre('sensibilisation')} />
+        <HubTitle>Audits</HubTitle>
+        <HubRow tone="pine" icon={<ClipboardCheck className={ic} />} title="Audit rapide" desc="5 composantes, tableau 20 du guide" onClick={onAuditRapide} />
+        <HubRow tone="sea" icon={<Layers className={ic} />} title="Audit complet" desc="Version détaillée, tableau 21 du guide" onClick={onAuditComplet} />
+        <HubRow tone="ochre" icon={<ChefHat className={ic} />} title="Audit cuisine (HACCP)" desc="Supervision de la restauration" onClick={onCuisineAudit} />
+        <HubRow tone="plum" icon={<ListChecks className={ic} />} title="Historique des audits" desc="Rapports, modification, suppression" meta={String(nbAudits)} onClick={onHistorique} />
       </section>
     </div>
   );

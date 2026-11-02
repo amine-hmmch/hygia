@@ -24,12 +24,12 @@ const STEPS = [
   {
     icon: BookOpen,
     title: 'Registres et plan annuel',
-    text: 'Onglet Registres : eau, vecteurs, prélèvements, sensibilisation, stérilisation, déchets. Onglet Suivi : plan d’action annuel (réalisé calculé depuis tes registres), actions correctives et rapport mensuel ou trimestriel.',
+    text: 'Le bouton + au centre sert à noter vite : eau, prélèvement, stérilisation, déchets, température, note ou audit. L’onglet Saisies garde tous les registres. L’onglet Suivi : plan d’action annuel (réalisé calculé depuis tes registres), actions correctives et rapport mensuel ou trimestriel.',
   },
   {
     icon: Stethoscope,
-    title: 'Terrain : audits',
-    text: 'Onglet Terrain : audit rapide ou complet, audit cuisine. Réponds Oui, Non ou N/A ; chaque « Non » devient une action corrective avec mesure, source et échéance modifiables. Fiches, glossaire et urgence AES sont dans Plus.',
+    title: 'Audits',
+    text: 'Dans Saisies, lance un audit rapide, complet ou cuisine. Réponds Oui, Non ou N/A ; chaque « Non » devient une action corrective avec mesure, source et échéance modifiables. Fiches, glossaire et urgence AES sont dans Plus.',
   },
   {
     icon: ChefHat,

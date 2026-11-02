@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Plus, Trash2, Check, X, Droplets, Bug, FlaskConical, Presentation, Printer, Download, Copy } from 'lucide-react';
 import { REGISTRES, RegistreDef, RegistreId } from '../data/thmData';
 import { thmService, RegistreEntree } from '../services/thmService';
@@ -68,7 +68,7 @@ function creerActionAuto(def: RegistreDef, e: RegistreEntree) {
 const inputCls =
   'w-full h-11 px-3 rounded-lg border border-medium bg-card text-main text-[15px] focus:outline-none focus:border-primary';
 
-const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onBack }) => {
+const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: boolean }> = ({ def, onBack, autoOpen }) => {
   const { showToast } = useToast();
   const [entrees, setEntrees] = useState<RegistreEntree[]>(() => thmService.getRegistre(def.id));
   const [open, setOpen] = useState(false);
@@ -134,6 +134,11 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
           .filter((e) => !isNaN(parseFloat(e.chlore)))
           .map((e) => ({ date: e.date, y: parseFloat(e.chlore), groupe: e.point || 'Point d’eau', ok: def.conforme?.(e) !== false }))
       : [];
+
+  useEffect(() => {
+    if (autoOpen) start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const nc = entrees.filter((e) => def.conforme?.(e) === false).length;
 
@@ -310,7 +315,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void }> = ({ def, onB
   );
 };
 
-export const RegistresModule: React.FC<{ registre: RegistreId; onBack: () => void }> = ({ registre, onBack }) => {
+export const RegistresModule: React.FC<{ registre: RegistreId; onBack: () => void; autoOpen?: boolean }> = ({ registre, onBack, autoOpen }) => {
   const def = REGISTRES.find((r) => r.id === registre)!;
-  return <Registre key={def.id} def={def} onBack={onBack} />;
+  return <Registre key={def.id} def={def} onBack={onBack} autoOpen={autoOpen} />;
 };
