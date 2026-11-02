@@ -1,7 +1,6 @@
 import { PlanAnnuel, planParDefaut, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
 import { storageService } from './storageService';
 import { cuisineService } from './cuisineService';
-import { sheetsService, lignes } from './sheetsService';
 
 export interface RegistreEntree {
   id: string;
@@ -67,7 +66,6 @@ export const thmService = {
   addEntree(id: RegistreId, data: Omit<RegistreEntree, 'id' | 'createdAt'>): RegistreEntree {
     const full = { ...data, id: uid(), createdAt: new Date().toISOString() } as RegistreEntree;
     write(regKey(id), [full, ...read<RegistreEntree[]>(regKey(id), [])]);
-    sheetsService.enqueue(lignes.registre(id, full));
     return full;
   },
   deleteEntree(id: RegistreId, entryId: string) {
