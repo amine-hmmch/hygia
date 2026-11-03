@@ -24,7 +24,7 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
   const { showToast } = useToast();
   const [s, setS] = useState(storageService.getSettings());
   const [type, setType] = useState<'all' | TypeHisto>('all');
-  const [periode, setPeriode] = useState<'7' | '30' | 'all'>('30');
+  const [periode, setPeriode] = useState<'0' | '7' | '30' | 'all'>('30');
   const [seulNc, setSeulNc] = useState(false);
   const [q, setQ] = useState('');
   const [max, setMax] = useState(40);
@@ -138,7 +138,7 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {([['7', '7 jours'], ['30', '30 jours'], ['all', 'Tout']] as const).map(([k, l]) => (
+          {([['0', 'Aujourd’hui'], ['7', '7 jours'], ['30', '30 jours'], ['all', 'Tout']] as const).map(([k, l]) => (
             <button key={k} className={chip(periode === k)} onClick={() => setPeriode(k)}>{l}</button>
           ))}
           <button className={chip(seulNc)} onClick={() => setSeulNc(!seulNc)}>Non conformes</button>
