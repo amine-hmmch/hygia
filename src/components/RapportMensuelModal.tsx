@@ -160,13 +160,13 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
           type="month"
           value={month}
           onChange={(e) => e.target.value && setMonth(e.target.value)}
-          className="h-10 px-3 rounded-lg border border-medium bg-card text-main text-[15px]"
+          className="h-10 px-2.5 rounded-lg border border-medium bg-card text-main text-[15px] min-w-[128px] flex-1 max-w-[180px]"
           aria-label="Mois du rapport"
         />
         <select
           value={periode}
           onChange={(e) => setPeriode(e.target.value as 'mois' | 'trimestre')}
-          className="h-10 px-2 rounded-lg border border-medium bg-card text-main text-[15px]"
+          className="h-10 px-1.5 rounded-lg border border-medium bg-card text-main text-[15px] shrink-0"
           aria-label="Période"
         >
           <option value="mois">Mois</option>
@@ -180,7 +180,7 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
           onClick={() => window.print()}
           className="h-10 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5"
         >
-          <Printer className="w-4 h-4" /> <span className="whitespace-nowrap">Imprimer</span>
+          <Printer className="w-4 h-4" /> <span className="whitespace-nowrap hidden min-[430px]:inline">Imprimer</span>
         </button>
         <button onClick={onClose} aria-label="Fermer" className="w-10 h-10 flex items-center justify-center text-sub">
           <X className="w-5 h-5" />
