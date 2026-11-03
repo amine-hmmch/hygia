@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search, Download, Check, X, ChevronRight } from 'lucide-react';
+import { Search, Download, Check, X, Clock, ChevronRight } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { extrasService, isoLocal } from '../services/extrasService';
 import { construireHistorique, TYPE_LABEL, TypeHisto, LigneHisto } from '../services/historiqueService';
@@ -151,8 +151,11 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
             {liste.slice(0, max).map((l) => (
               <li key={l.id} className="row-rule">
                 <button onClick={() => ouvrir(l)} className="w-full py-3 flex items-start gap-3 text-start">
-                  <span className={`mt-0.5 shrink-0 ${l.nc ? 'text-danger' : 'text-success'}`}>
-                    {l.nc ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+                  <span
+                    className={`mt-0.5 shrink-0 ${l.nc ? 'text-danger' : l.attente ? 'text-warning' : 'text-success'}`}
+                    title={l.nc ? 'Non conforme ou en retard' : l.attente ? 'À traiter' : 'Fait'}
+                  >
+                    {l.nc ? <X className="w-4 h-4" /> : l.attente ? <Clock className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[15px] text-main leading-snug">{l.titre}</span>

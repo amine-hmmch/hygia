@@ -17,6 +17,8 @@ export interface LigneHisto {
   titre: string;
   sous: string;
   nc: boolean;
+  /** À traiter : action à faire / en cours, résultat en attente (ni conforme, ni non conforme pour l'instant). */
+  attente?: boolean;
   refId?: string;
 }
 
@@ -41,7 +43,7 @@ export function construireHistorique(): LigneHisto[] {
     thmService.getRegistre(def.id).forEach((e) =>
       out.push({
         id: `${def.id}_${e.id}`, type: def.id as TypeHisto, date: e.date || '', heure: e.heure || '',
-        titre: def.titreLigne(e), sous: def.sousTitre(e), nc: def.conforme?.(e) === false, refId: e.id,
+        titre: def.titreLigne(e), sous: def.sousTitre(e), nc: def.conforme?.(e) === false, attente: e.resultat === 'En attente', refId: e.id,
       })
     );
   });
@@ -75,7 +77,8 @@ export function construireHistorique(): LigneHisto[] {
     out.push({
       id: `ac_${a.id}`, type: 'action', date: (a.createdAt || '').slice(0, 10), heure: (a.createdAt || '').slice(11, 16),
       titre: a.itemTitle || a.description.slice(0, 60), sous: `${STATUT[a.statut] || a.statut} · échéance ${a.echeance.split('-').reverse().join('/')}`,
-      nc: (a.statut === 'a_faire' || a.statut === 'en_cours') && a.echeance < today, refId: a.id,
+      nc: (a.statut === 'a_faire' || a.statut === 'en_cours') && a.echeance < today,
+      attente: a.statut === 'a_faire' || a.statut === 'en_cours', refId: a.id,
     })
   );
   const jours = thmService.getJours();
