@@ -5,6 +5,7 @@ export const DEFAULT_SERVICES = [
   'Consultation Médicale',
   'Consultation Santé Maternelle et Infantile (SMI)',
   'Salle d’Accouchement',
+  'Bloc Opératoire',
   'Local de Stérilisation',
   'Laboratoire d’Analyses Médicales',
   'Unité Dentaire',

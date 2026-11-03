@@ -97,7 +97,19 @@ export const storageService = {
       const data = localStorage.getItem(SERVICES_STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Migration unique : « Bloc Opératoire » ajouté à la liste type, on l'insère dans les listes déjà enregistrées.
+          if (!localStorage.getItem('essp_hygiene_svc_bloc_v1')) {
+            localStorage.setItem('essp_hygiene_svc_bloc_v1', '1');
+            if (!parsed.some((x: string) => /bloc/i.test(x))) {
+              const i = parsed.indexOf('Salle d’Accouchement');
+              const maj = i >= 0 ? [...parsed.slice(0, i + 1), 'Bloc Opératoire', ...parsed.slice(i + 1)] : [...parsed, 'Bloc Opératoire'];
+              this.saveServices(maj);
+              return maj;
+            }
+          }
+          return parsed;
+        }
       }
       return DEFAULT_SERVICES;
     } catch {
