@@ -17,6 +17,19 @@ import { CUISINE_RELEVES_KEY, CUISINE_AUDITS_KEY, cuisineService } from './cuisi
 
 const AUDITS_STORAGE_KEY = 'essp_hygiene_audits_v1';
 const ACTIONS_STORAGE_KEY = 'essp_hygiene_actions_v1';
+const AUDIT_DRAFT_KEY = 'essp_hygiene_audit_draft_v1';
+
+export interface AuditDraft {
+  version: ChecklistVersion;
+  service: string;
+  date: string;
+  auditeur: string;
+  etablissement: string;
+  commentairesGeneraux: string;
+  responses: Record<string, AuditItemResponse>;
+  actionOverrides: Record<string, any>;
+  savedAt: string;
+}
 const SERVICES_STORAGE_KEY = 'essp_hygiene_services_v1';
 const SETTINGS_STORAGE_KEY = 'essp_hygiene_settings_v1';
 const FAVORITES_STORAGE_KEY = 'essp_hygiene_favorites_v1';
@@ -393,6 +406,28 @@ export const storageService = {
     return completeAudit;
   },
 
+  // Brouillon d'audit (enregistrement automatique d'un nouvel audit en cours)
+  getAuditDraft(): AuditDraft | null {
+    try {
+      const d = JSON.parse(localStorage.getItem(AUDIT_DRAFT_KEY) || 'null');
+      return d && d.responses ? d : null;
+    } catch {
+      return null;
+    }
+  },
+  saveAuditDraft(d: AuditDraft): void {
+    try {
+      localStorage.setItem(AUDIT_DRAFT_KEY, JSON.stringify(d));
+    } catch (e) {
+      console.error('Failed to save audit draft', e);
+    }
+  },
+  clearAuditDraft(): void {
+    try {
+      localStorage.removeItem(AUDIT_DRAFT_KEY);
+    } catch {}
+  },
+
   deleteAudit(id: string): void {
     const audits = this.getAudits().filter((a) => a.id !== id);
     try {
@@ -728,6 +763,7 @@ export const storageService = {
     try {
       localStorage.removeItem(AUDITS_STORAGE_KEY);
       localStorage.removeItem(ACTIONS_STORAGE_KEY);
+      localStorage.removeItem(AUDIT_DRAFT_KEY);
       localStorage.removeItem(STERILISATION_STORAGE_KEY);
       localStorage.removeItem(DECHETS_STORAGE_KEY);
       localStorage.removeItem(CUISINE_RELEVES_KEY);

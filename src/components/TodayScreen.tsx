@@ -10,6 +10,7 @@ interface Props {
   actions: CorrectiveAction[];
   onOpenJournal: () => void;
   onAddTask: () => void;
+  onResumeAudit: () => void;
   onOpenPlan: () => void;
   onOpenRegistre: (id: RegistreId, auto?: boolean) => void;
   onNewAudit: () => void;
@@ -30,9 +31,12 @@ const REPERES = [
 const heureMaintenant = () => new Date().toTimeString().slice(0, 5);
 const isoLocal = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
-export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
+export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onResumeAudit, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
   const [tick, setTick] = useState(0);
   const settings = storageService.getSettings();
+  const d0 = storageService.getAuditDraft();
+  const nBrouillon = d0 ? Object.values(d0.responses).filter((r) => r.value !== null).length : 0;
+  const brouillon = d0 && nBrouillon > 0 ? { service: d0.service, n: nBrouillon } : null;
   const userName = settings.userName?.trim();
   const etab = settings.etablissement?.trim();
   const now = new Date();
@@ -96,6 +100,22 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
           </button>
         ))}
       </section>
+
+      {brouillon && (
+        <section className="rise">
+          <button
+            onClick={onResumeAudit}
+            className="w-full min-h-[56px] rounded-lg border border-warning-border bg-warning-tint px-3.5 py-2.5 flex items-center gap-3 text-start"
+          >
+            <ClipboardCheck className="w-5 h-5 shrink-0 text-warning" />
+            <span className="flex-1 text-[14px] text-main leading-snug">
+              <span className="font-medium">Audit en cours</span> · {brouillon.service} · {brouillon.n} réponse{brouillon.n > 1 ? 's' : ''}
+              <span className="block text-[12px] text-sub">Enregistré automatiquement. Touche pour reprendre.</span>
+            </span>
+            <ChevronRight className="w-4 h-4 shrink-0" />
+          </button>
+        </section>
+      )}
 
       {alertes.length > 0 && (
         <section className="rise space-y-2" style={{ animationDelay: '100ms' }}>

@@ -60,6 +60,7 @@ export default function App() {
   const [registreId, setRegistreId] = useState<RegistreId>('eau');
   const [registreAuto, setRegistreAuto] = useState(false);
   const [journalEdit, setJournalEdit] = useState(false);
+  const [auditResume, setAuditResume] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [cuisineTab, setCuisineTab] = useState<'releves' | 'audit' | 'fiches'>('releves');
 
@@ -107,9 +108,20 @@ export default function App() {
 
   const handleStartNewAudit = (version: ChecklistVersion = 'courte', compId?: string, defaultService?: string) => {
     setSelectedAudit(null);
+    setAuditResume(false);
     setAuditVersion(version);
     setFocusComponent(compId);
     setAuditServiceTarget(defaultService);
+    go('runner');
+  };
+
+  const handleResumeAudit = () => {
+    const d = storageService.getAuditDraft();
+    setSelectedAudit(null);
+    setAuditResume(true);
+    setAuditVersion(d?.version || 'courte');
+    setFocusComponent(undefined);
+    setAuditServiceTarget(undefined);
     go('runner');
   };
 
@@ -180,6 +192,7 @@ export default function App() {
             defaultVersion={auditVersion}
             defaultService={auditServiceTarget}
             defaultFocusComponent={focusComponent}
+            reprendre={auditResume}
             onSave={handleSaveAudit}
             onCancel={() => (selectedAudit ? go('detail') : back())}
           />
@@ -327,6 +340,7 @@ export default function App() {
             actions={actions}
             onOpenJournal={() => { setJournalEdit(false); go('journal'); }}
             onAddTask={() => { setJournalEdit(true); go('journal'); }}
+            onResumeAudit={handleResumeAudit}
             onOpenPlan={() => go('plan')}
             onOpenRegistre={openRegistre}
             onNewAudit={() => handleStartNewAudit('courte')}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Check,
   X,
@@ -36,6 +36,8 @@ interface AuditRunnerProps {
   defaultVersion?: ChecklistVersion;
   defaultService?: string;
   defaultFocusComponent?: string;
+  /** Reprendre directement le brouillon enregistré automatiquement. */
+  reprendre?: boolean;
   onSave: (savedAudit: Audit) => void;
   onCancel: () => void;
 }
@@ -73,6 +75,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
   defaultVersion = 'courte',
   defaultService,
   defaultFocusComponent,
+  reprendre,
   onSave,
   onCancel,
 }) => {
@@ -80,38 +83,47 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
   const settings = storageService.getSettings();
   const availableServices = storageService.getServices();
 
+  // Brouillon enregistré automatiquement (nouvel audit seulement)
+  const draft0 = useMemo(() => {
+    if (initialAudit?.id) return null;
+    const d = storageService.getAuditDraft();
+    return d && Object.values(d.responses).some((r) => r.value !== null || r.observation) ? d : null;
+  }, [initialAudit]);
+  const [bandeauBrouillon, setBandeauBrouillon] = useState<boolean>(!!draft0 && !reprendre);
+  const src = initialAudit || (draft0 && reprendre ? draft0 : null);
+
   // Audit metadata state
   const [version, setVersion] = useState<ChecklistVersion>(
-    initialAudit?.version || defaultVersion
+    src?.version || defaultVersion
   );
   const [service, setService] = useState<string>(
-    initialAudit?.service || defaultService || availableServices[0] || 'Salle de Soins'
+    src?.service || defaultService || availableServices[0] || 'Salle de Soins'
   );
   const [newServiceInput, setNewServiceInput] = useState('');
   const [showAddService, setShowAddService] = useState(false);
 
   const [date, setDate] = useState<string>(
-    initialAudit?.date || new Date().toISOString().split('T')[0]
+    src?.date || new Date().toISOString().split('T')[0]
   );
   const [auditeur, setAuditeur] = useState<string>(
-    initialAudit?.auditeur || settings.userName || settings.auditeurDefaut || ''
+    src?.auditeur || settings.userName || settings.auditeurDefaut || ''
   );
   const [etablissement, setEtablissement] = useState<string>(
-    initialAudit?.etablissement || settings.etablissement || ''
+    src?.etablissement || settings.etablissement || ''
   );
   const [commentairesGeneraux, setCommentairesGeneraux] = useState<string>(
-    initialAudit?.commentairesGeneraux || ''
+    src?.commentairesGeneraux || ''
   );
 
   // Responses state { [itemId]: { itemId, value, observation } }
   const [responses, setResponses] = useState<Record<string, AuditItemResponse>>(
-    initialAudit?.responses || {}
+    src?.responses || {}
   );
 
   // Inline corrective action overrides for items answered 'non'
   const [actionOverrides, setActionOverrides] = useState<
     Record<string, { description?: string; responsable?: string; echeance?: string; statut?: ActionStatus; priorite?: Priorite }>
-  >({});
+  >(draft0 && reprendre && !initialAudit ? draft0.actionOverrides || {} : {});
 
   // Active component navigation
   const template = useMemo(() => getChecklist(version), [version]);
@@ -165,6 +177,56 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
     });
   };
 
+  // Enregistrement automatique : dès la première réponse, puis à chaque modification
+  const [autoSaveHeure, setAutoSaveHeure] = useState<string | null>(null);
+  const premierPassage = useRef(true);
+  useEffect(() => {
+    if (premierPassage.current) {
+      premierPassage.current = false;
+      return;
+    }
+    if (bandeauBrouillon) return; // on attend le choix « reprendre / repartir de zéro »
+    const contenu =
+      answeredCount > 0 || commentairesGeneraux.trim() !== '' || Object.values(responses).some((r) => r.observation);
+    if (!contenu) return;
+    const t = setTimeout(() => {
+      if (initialAudit?.id) {
+        storageService.saveAudit({
+          id: initialAudit.id,
+          titre: initialAudit.titre,
+          version, service, date, auditeur, etablissement, responses, commentairesGeneraux,
+          createdAt: initialAudit.createdAt,
+        });
+      } else {
+        storageService.saveAuditDraft({
+          version, service, date, auditeur, etablissement, commentairesGeneraux, responses, actionOverrides,
+          savedAt: new Date().toISOString(),
+        });
+      }
+      setAutoSaveHeure(new Date().toTimeString().slice(0, 5));
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [responses, commentairesGeneraux, service, version, date, auditeur, etablissement, actionOverrides, bandeauBrouillon]);
+
+  const reprendreBrouillon = () => {
+    if (!draft0) return;
+    setVersion(draft0.version);
+    setService(draft0.service);
+    setDate(draft0.date);
+    setAuditeur(draft0.auditeur);
+    setEtablissement(draft0.etablissement);
+    setCommentairesGeneraux(draft0.commentairesGeneraux);
+    setResponses(draft0.responses);
+    setActionOverrides(draft0.actionOverrides || {});
+    setActiveCompIndex(0);
+    setBandeauBrouillon(false);
+  };
+  const repartirDeZero = () => {
+    storageService.clearAuditDraft();
+    setBandeauBrouillon(false);
+  };
+
   // Add new service
   const handleAddNewService = () => {
     if (newServiceInput.trim()) {
@@ -211,6 +273,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
       }
     }
 
+    if (!bandeauBrouillon) storageService.clearAuditDraft();
     showToast(isDraft ? 'Brouillon enregistré' : 'Audit enregistré avec succès !', 'success');
     onSave(saved);
   };
@@ -361,6 +424,18 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
 
   return (
     <div className="space-y-5 pb-32">
+      {bandeauBrouillon && draft0 && (
+        <div className="rounded-lg border border-warning-border bg-warning-tint p-3.5 space-y-2.5" role="alert">
+          <p className="text-[14px] text-main leading-snug">
+            <span className="font-semibold">Audit en cours trouvé</span> · {draft0.service} · {Object.values(draft0.responses).filter((r) => r.value !== null).length} réponses
+            <span className="text-sub"> (enregistré automatiquement)</span>
+          </p>
+          <div className="flex gap-2">
+            <button onClick={reprendreBrouillon} className="min-h-[44px] px-4 rounded-lg bg-primary text-white dark:text-[#10201a] text-[14px] font-medium">Reprendre</button>
+            <button onClick={repartirDeZero} className="min-h-[44px] px-4 rounded-lg border border-medium text-[14px] text-main">Repartir de zéro</button>
+          </div>
+        </div>
+      )}
       {/* Barre de progression collante */}
       <div className="sticky top-[57px] z-20 bg-surface -mx-4 px-4 pt-2 pb-2.5 border-b border-soft">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
@@ -383,7 +458,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
         </div>
         <div className="max-w-4xl mx-auto mt-1.5">
           <div className="flex justify-between text-[11px] text-sub mb-1">
-            <span>{answeredCount} sur {totalItemsCount} points</span>
+            <span>{answeredCount} sur {totalItemsCount} points{autoSaveHeure ? ` · enregistré automatiquement à ${autoSaveHeure}` : ''}</span>
             <span className="font-mono">{progressPercent}%</span>
           </div>
           <div className="h-1 bg-card-subtle rounded">
