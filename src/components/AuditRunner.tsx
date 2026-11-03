@@ -19,7 +19,12 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
+  SprayCan,
+  ShieldCheck,
+  Trash2,
+  ClipboardList,
 } from 'lucide-react';
+import { HygieneMainsIcon, SterilisationIcon } from './AppMaskedIcons';
 import { getRecommandation, addDays, PRIORITE_LABEL, Priorite } from '../data/planActionData';
 import { Audit, ChecklistVersion, ComplianceValue, AuditItemResponse, ActionStatus } from '../types';
 import { getChecklist, getAllItemsForVersion } from '../data/checklistsData';
@@ -54,6 +59,14 @@ const DEFAULT_RESPONSABLES = [
   'Technicien d’hygiène du milieu',
   'Responsable Pharmacie',
 ];
+
+const RUBRIQUE_ICONES: Record<string, React.ElementType> = {
+  env_interne: SprayCan,
+  epi: ShieldCheck,
+  hygiene_mains: HygieneMainsIcon,
+  sterilisation: SterilisationIcon,
+  dechets_dmp: Trash2,
+};
 
 export const AuditRunner: React.FC<AuditRunnerProps> = ({
   initialAudit,
@@ -443,23 +456,29 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
       </section>
 
       {/* Rubriques */}
-      <div className="-mx-4 px-4 border-b border-soft flex gap-5 overflow-x-auto no-scrollbar">
+      <div className="-mx-4 border-b border-soft grid" style={{ gridTemplateColumns: `repeat(${template.composantes.length}, minmax(0, 1fr))` }} role="tablist" aria-label="Rubriques de l’audit">
         {template.composantes.map((comp, idx) => {
           const sel = idx === activeCompIndex;
           const sc = liveScores.scoresParComposante[comp.id];
+          const Icon = RUBRIQUE_ICONES[comp.id] || ClipboardList;
+          const note = sc && sc.ouiCount + sc.nonCount > 0 ? sc.score : null;
           return (
             <button
               key={comp.id}
               type="button"
+              role="tab"
+              aria-selected={sel}
+              aria-label={comp.titre}
+              title={comp.titre}
               onClick={() => setActiveCompIndex(idx)}
-              className={`shrink-0 h-11 text-[14px] border-b-2 -mb-px flex items-center gap-1.5 ${
-                sel ? 'border-primary text-primary font-medium' : 'border-transparent text-sub'
+              className={`h-14 border-b-2 -mb-px flex flex-col items-center justify-center gap-0.5 ${
+                sel ? 'border-primary text-primary' : 'border-transparent text-sub'
               }`}
             >
-              {comp.titre}
-              {sc && sc.ouiCount + sc.nonCount > 0 && (
-                <span className={`font-mono text-[11px] ${scoreTone(sc.score)}`}>{sc.score}</span>
-              )}
+              <Icon size={22} className="w-[22px] h-[22px]" />
+              <span className={`font-mono text-[10.5px] leading-none h-3 ${note === null ? 'text-muted-custom' : scoreTone(note)}`}>
+                {note === null ? '·' : note}
+              </span>
             </button>
           );
         })}
