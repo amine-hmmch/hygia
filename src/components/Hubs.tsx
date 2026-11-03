@@ -143,15 +143,31 @@ export const SuiviHub: React.FC<{
 /* --------------------------------- Plus --------------------------------- */
 
 export const PlusHub: React.FC<{
+  nom: string;
+  initiales: string;
+  sousTitre: string;
+  onProfil: () => void;
   onFiches: () => void;
   onGlossaire: () => void;
   onAes: () => void;
   onReglages: () => void;
   onTutoriel: () => void;
   onAPropos: () => void;
-}> = ({ onFiches, onGlossaire, onAes, onReglages, onTutoriel, onAPropos }) => (
+}> = ({ nom, initiales, sousTitre, onProfil, onFiches, onGlossaire, onAes, onReglages, onTutoriel, onAPropos }) => (
   <div className="space-y-6 pb-6">
-    <HubHeader title="Plus" subtitle="Références, réglages et aide" />
+    <HubHeader title="Plus" subtitle="Profil, références, réglages et aide" />
+    <button
+      type="button"
+      onClick={onProfil}
+      className="w-full flex items-center gap-4 rounded-xl border border-soft bg-card px-4 py-3.5 text-start active:bg-card-subtle"
+    >
+      <span className="w-12 h-12 rounded-full bg-primary text-white dark:text-[#10201a] flex items-center justify-center font-serif-display text-[20px] shrink-0">{initiales}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[16px] font-medium text-main leading-snug truncate">{nom}</span>
+        <span className="block text-[13px] text-sub leading-snug truncate">{sousTitre}</span>
+      </span>
+      <ChevronRight className="w-4 h-4 text-muted-custom shrink-0" />
+    </button>
     <section>
       <HubTitle>Références</HubTitle>
       <HubRow tone="pine" icon={<BookOpen className={ic} />} title="Fiches pratiques" desc="Mains, EPI, bionettoyage, dilutions" onClick={onFiches} />

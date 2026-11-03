@@ -31,6 +31,7 @@ export interface AppSettings {
   userRole?: string;            // Sa fonction (facultatif)
   provinceRegion?: string;      // Province / région (facultatif)
   auditeurDefaut?: string;      // Auditeur par défaut (facultatif)
+  pointEauDefaut?: string;      // Point d'eau habituel (facultatif)
   theme: 'dark' | 'light';
 }
 

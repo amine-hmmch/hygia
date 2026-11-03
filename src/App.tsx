@@ -10,6 +10,7 @@ import { TodayScreen } from './components/TodayScreen';
 import { SaisirHub, SuiviHub, PlusHub } from './components/Hubs';
 import { QuickAddSheet, AjoutRapide } from './components/QuickAddSheet';
 import { SubScreen } from './components/SubScreen';
+import { ProfilScreen, initiales } from './components/ProfilScreen';
 import { AuditRunner } from './components/AuditRunner';
 import { AuditDetailView } from './components/AuditDetailView';
 import { AuditHistory } from './components/AuditHistory';
@@ -48,7 +49,8 @@ type View =
   | 'actions'
   | 'fiches'
   | 'reglages'
-  | 'historique';
+  | 'historique'
+  | 'profil';
 
 const TUTORIAL_KEY = 'essp_hygiene_tutorial_v1';
 
@@ -245,6 +247,22 @@ export default function App() {
             />
           </SubScreen>
         );
+      case 'profil':
+        return (
+          <SubScreen title="Mon profil" onBack={back}>
+            <ProfilScreen
+              onOpenAudit={handleViewAudit}
+              onOpenRegistre={(id) => openRegistre(id)}
+              onOpenType={(t) => {
+                if (t === 'sterilisation') go('sterilisation');
+                else if (t === 'dechets') go('dechets');
+                else if (t === 'cuisine') openCuisine('releves');
+                else if (t === 'action') go('actions');
+                else go('journal');
+              }}
+            />
+          </SubScreen>
+        );
       case 'historique':
         return (
           <SubScreen title="Historique des audits" onBack={back}>
@@ -290,6 +308,10 @@ export default function App() {
       case 'plus':
         return (
           <PlusHub
+            nom={storageService.getSettings().userName || 'Mon profil'}
+            initiales={initiales(storageService.getSettings().userName)}
+            sousTitre={[storageService.getSettings().userRole, storageService.getSettings().etablissement].filter(Boolean).join(' · ') || 'Identité et historique'}
+            onProfil={() => go('profil')}
             onFiches={() => go('fiches')}
             onGlossaire={() => setIsGlossaireOpen(true)}
             onAes={() => setIsAesOpen(true)}

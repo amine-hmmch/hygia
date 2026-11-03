@@ -91,6 +91,10 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
       });
     }
     if (def.champs.some((c) => c.id === 'operateur') && !v.operateur) v.operateur = operateurDefaut;
+    if (def.id === 'eau' && !v.point) {
+      const habituel = storageService.getSettings().pointEauDefaut;
+      if (habituel) v.point = habituel;
+    }
     setVals(v);
     setDate(today());
     setHeure(nowTime());
