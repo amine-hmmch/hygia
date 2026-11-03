@@ -110,10 +110,6 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
           <label className="text-xs font-semibold text-main block mb-1">Établissement</label>
           <input aria-label="Établissement" className={field} value={s.etablissement || ''} onChange={(e) => maj({ etablissement: e.target.value })} />
         </div>
-        <div>
-          <label className="text-xs font-semibold text-main block mb-1">Point d’eau habituel</label>
-          <input aria-label="Point d’eau habituel" className={field} value={s.pointEauDefaut || ''} onChange={(e) => maj({ pointEauDefaut: e.target.value })} placeholder="proposé au premier relevé de chlore" />
-        </div>
         <button onClick={enregistrer} className="h-11 px-5 rounded-lg bg-primary text-white dark:text-[#10201a] font-medium">
           Enregistrer
         </button>
