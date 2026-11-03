@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, ChevronRight, Droplets, FlaskConical, NotebookPen, ClipboardCheck, AlertTriangle } from 'lucide-react';
+import { Check, ChevronRight, Droplets, FlaskConical, NotebookPen, ClipboardCheck, AlertTriangle, Plus } from 'lucide-react';
 import { extrasService } from '../services/extrasService';
 import { thmService } from '../services/thmService';
 import { storageService } from '../services/storageService';
@@ -9,6 +9,7 @@ import { NOMS_MOIS_LONGS, RegistreId } from '../data/thmData';
 interface Props {
   actions: CorrectiveAction[];
   onOpenJournal: () => void;
+  onAddTask: () => void;
   onOpenPlan: () => void;
   onOpenRegistre: (id: RegistreId, auto?: boolean) => void;
   onNewAudit: () => void;
@@ -29,7 +30,7 @@ const REPERES = [
 const heureMaintenant = () => new Date().toTimeString().slice(0, 5);
 const isoLocal = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
-export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
+export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
   const [tick, setTick] = useState(0);
   const settings = storageService.getSettings();
   const userName = settings.userName?.trim();
@@ -135,9 +136,14 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onOpenPla
             </button>
           ))
         )}
-        <button onClick={onOpenJournal} className="pt-3 text-[13px] text-primary font-medium flex items-center gap-1">
-          {taches.length > 6 ? `Voir les ${taches.length} tâches et le carnet` : 'Ouvrir le carnet de bord'} <ChevronRight className="w-4 h-4" />
-        </button>
+        <div className="pt-3 flex items-center justify-between gap-3">
+          <button onClick={onOpenJournal} className="text-[13px] text-primary font-medium flex items-center gap-1">
+            {taches.length > 6 ? `Voir les ${taches.length} tâches et le carnet` : 'Ouvrir le carnet de bord'} <ChevronRight className="w-4 h-4" />
+          </button>
+          <button onClick={onAddTask} className="min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
+            <Plus className="w-4 h-4" /> Ajouter une tâche
+          </button>
+        </div>
       </section>
 
       {/* Plan du mois */}

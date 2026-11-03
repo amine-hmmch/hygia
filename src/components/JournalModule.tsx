@@ -22,7 +22,7 @@ const fmtLong = (d: string) => {
 const inputCls =
   'w-full min-h-[44px] px-3 py-2 rounded-lg bg-card border border-medium text-main text-[15px] focus:outline-none focus:border-primary';
 
-export const JournalModule: React.FC<{ onBackToHome: () => void }> = ({ onBackToHome }) => {
+export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: boolean }> = ({ onBackToHome, openEditor }) => {
   const [date, setDate] = useState(aujourdhui());
   const [tick, setTick] = useState(0);
   const [note, setNote] = useState('');
@@ -80,10 +80,16 @@ export const JournalModule: React.FC<{ onBackToHome: () => void }> = ({ onBackTo
   /* ----------------- Éditeur de tâches ----------------- */
   const [edit, setEdit] = useState<TacheJournal[]>([]);
   const [confirmReset, setConfirmReset] = useState(false);
-  const ouvrirGestion = () => {
-    setEdit(thmService.getTaches().map((t) => ({ ...t })));
+  const ouvrirGestion = (nouvelle = false) => {
+    const liste = thmService.getTaches().map((t) => ({ ...t }));
+    if (nouvelle) liste.push({ id: thmService.newTacheId(), titre: '', frequence: 'quotidien' });
+    setEdit(liste);
     setGerer(true);
   };
+  useEffect(() => {
+    if (openEditor) ouvrirGestion(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const enregistrerGestion = () => {
     thmService.saveTaches(edit.filter((t) => t.titre.trim()));
     setGerer(false);
@@ -212,8 +218,8 @@ export const JournalModule: React.FC<{ onBackToHome: () => void }> = ({ onBackTo
           <h2 className="text-lg font-semibold text-main leading-tight">Carnet de bord</h2>
           <p className="text-[13px] text-sub leading-tight">Ce que tu as fait chaque jour</p>
         </div>
-        <button onClick={ouvrirGestion} className="w-10 h-10 flex items-center justify-center text-sub" aria-label="Gérer mes tâches">
-          <SlidersHorizontal className="w-5 h-5" />
+        <button onClick={() => ouvrirGestion()} className="min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5" aria-label="Gérer mes tâches">
+          <SlidersHorizontal className="w-4 h-4" /> Mes tâches
         </button>
       </div>
 
@@ -236,7 +242,7 @@ export const JournalModule: React.FC<{ onBackToHome: () => void }> = ({ onBackTo
           <span className="font-mono text-xs text-sub">{faits}/{taches.length}</span>
         </div>
         {taches.length === 0 ? (
-          <p className="py-4 text-sm text-sub">Aucune tâche. Ajoute-en avec le bouton réglages en haut à droite.</p>
+          <p className="py-4 text-sm text-sub">Aucune tâche. Touche « Ajouter une tâche » ci-dessous.</p>
         ) : (
           taches.map(({ tache, fait, heure }) => (
             <button
@@ -257,6 +263,9 @@ export const JournalModule: React.FC<{ onBackToHome: () => void }> = ({ onBackTo
             </button>
           ))
         )}
+        <button onClick={() => ouvrirGestion(true)} className="mt-3 min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
+          <Plus className="w-4 h-4" /> Ajouter une tâche
+        </button>
       </section>
 
       {/* Notes */}

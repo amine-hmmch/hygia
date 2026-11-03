@@ -59,6 +59,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>('home');
   const [registreId, setRegistreId] = useState<RegistreId>('eau');
   const [registreAuto, setRegistreAuto] = useState(false);
+  const [journalEdit, setJournalEdit] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [cuisineTab, setCuisineTab] = useState<'releves' | 'audit' | 'fiches'>('releves');
 
@@ -214,7 +215,7 @@ export default function App() {
       case 'registre':
         return <RegistresModule registre={registreId} onBack={back} autoOpen={registreAuto} />;
       case 'journal':
-        return <JournalModule onBackToHome={back} />;
+        return <JournalModule onBackToHome={back} openEditor={journalEdit} />;
       case 'tableau_bord':
         return (
           <TableauDeBordModule
@@ -324,7 +325,8 @@ export default function App() {
         return (
           <TodayScreen
             actions={actions}
-            onOpenJournal={() => go('journal')}
+            onOpenJournal={() => { setJournalEdit(false); go('journal'); }}
+            onAddTask={() => { setJournalEdit(true); go('journal'); }}
             onOpenPlan={() => go('plan')}
             onOpenRegistre={openRegistre}
             onNewAudit={() => handleStartNewAudit('courte')}
