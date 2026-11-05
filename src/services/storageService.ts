@@ -44,6 +44,9 @@ export interface AppSettings {
   userRole?: string;            // Sa fonction (facultatif)
   provinceRegion?: string;      // Province / région (facultatif)
   auditeurDefaut?: string;      // Auditeur par défaut (facultatif)
+  niveau?: string;              // Lieu de travail (assistant de configuration)
+  sujets?: string[];            // Sujets suivis (absent = tout est actif)
+  configure?: boolean;          // L'assistant de configuration a été rempli
   theme: 'dark' | 'light';
 }
 

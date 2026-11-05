@@ -3,6 +3,8 @@ import {
   Droplets, FlaskConical, Bug, Presentation, Thermometer, Trash2, NotebookPen, ClipboardCheck, X,
 } from 'lucide-react';
 import { SterilisationIcon } from './AppMaskedIcons';
+import { storageService } from '../services/storageService';
+import { sujetActif, SujetId } from '../data/configData';
 
 export type AjoutRapide =
   | 'eau' | 'prelevements' | 'vecteurs' | 'sensibilisation'
@@ -27,6 +29,8 @@ const ITEMS: { k: AjoutRapide; label: string; icon: React.ReactNode; tone: strin
 ];
 
 export const QuickAddSheet: React.FC<Props> = ({ isOpen, onClose, onPick }) => {
+  const sujets = storageService.getSettings().sujets;
+  const items = ITEMS.filter((it) => it.k === 'note' || it.k === 'audit' || sujetActif(sujets, it.k as SujetId));
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -49,7 +53,7 @@ export const QuickAddSheet: React.FC<Props> = ({ isOpen, onClose, onPick }) => {
           </button>
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {ITEMS.map((it) => (
+          {items.map((it) => (
             <button
               key={it.k}
               onClick={() => onPick(it.k)}

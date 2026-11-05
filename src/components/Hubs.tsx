@@ -22,10 +22,13 @@ import {
   Info,
   NotebookPen,
   Thermometer,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { SterilisationIcon } from './AppMaskedIcons';
 import { RegistreId } from '../data/thmData';
 import { thmService } from '../services/thmService';
+import { storageService } from '../services/storageService';
+import { sujetActif } from '../data/configData';
 
 type Tone = 'pine' | 'ochre' | 'clay' | 'plum' | 'sea';
 
@@ -82,6 +85,8 @@ export const SaisirHub: React.FC<{
   nbAudits: number;
 }> = ({ onJournal, onRegistre, onSterilisation, onDechets, onCuisineReleves, onCuisineAudit, onAuditRapide, onAuditComplet, onHistorique, nbAudits }) => {
   const n = (id: RegistreId) => String(thmService.getRegistre(id).length);
+  const su = storageService.getSettings().sujets;
+  const on = (id: Parameters<typeof sujetActif>[1]) => sujetActif(su, id);
   return (
     <div className="space-y-6 pb-6">
       <HubHeader title="Saisies" subtitle="Tes registres et tes audits. Pour noter vite, utilise le bouton +" />
@@ -91,25 +96,25 @@ export const SaisirHub: React.FC<{
       </section>
       <section>
         <HubTitle>Eau et environnement</HubTitle>
-        <HubRow tone="sea" icon={<Droplets className={ic} />} title="Eau de boisson" desc="Chlore résiduel libre et pH" meta={n('eau')} onClick={() => onRegistre('eau')} />
-        <HubRow tone="clay" icon={<Bug className={ic} />} title="Lutte antivectorielle" desc="Dératisation, désinsectisation, capture" meta={n('vecteurs')} onClick={() => onRegistre('vecteurs')} />
-        <HubRow tone="plum" icon={<FlaskConical className={ic} />} title="Prélèvements" desc="Eau, aliments, surfaces, air" meta={n('prelevements')} onClick={() => onRegistre('prelevements')} />
+        {on('eau') && <HubRow tone="sea" icon={<Droplets className={ic} />} title="Eau de boisson" desc="Chlore résiduel libre et pH" meta={n('eau')} onClick={() => onRegistre('eau')} />}
+        {on('vecteurs') && <HubRow tone="clay" icon={<Bug className={ic} />} title="Lutte antivectorielle" desc="Dératisation, désinsectisation, capture" meta={n('vecteurs')} onClick={() => onRegistre('vecteurs')} />}
+        {on('prelevements') && <HubRow tone="plum" icon={<FlaskConical className={ic} />} title="Prélèvements" desc="Eau, aliments, surfaces, air" meta={n('prelevements')} onClick={() => onRegistre('prelevements')} />}
       </section>
       <section>
         <HubTitle>Soins et déchets</HubTitle>
-        <HubRow tone="ochre" icon={<SterilisationIcon size={20} />} title="Stérilisation" desc="Cycles d’autoclave, contrôles, traçabilité" onClick={onSterilisation} />
-        <HubRow tone="clay" icon={<Trash2 className={ic} />} title="Déchets de soins" desc="Pesées, tri, évolution mensuelle" onClick={onDechets} />
+        {on('sterilisation') && <HubRow tone="ochre" icon={<SterilisationIcon size={20} />} title="Stérilisation" desc="Cycles d’autoclave, contrôles, traçabilité" onClick={onSterilisation} />}
+        {on('dechets') && <HubRow tone="clay" icon={<Trash2 className={ic} />} title="Déchets de soins" desc="Pesées, tri, évolution mensuelle" onClick={onDechets} />}
       </section>
       <section>
         <HubTitle>Cuisine et formation</HubTitle>
-        <HubRow tone="ochre" icon={<Thermometer className={ic} />} title="Relevés de température" desc="Frigos, réception, cuisson, maintien" onClick={onCuisineReleves} />
-        <HubRow tone="plum" icon={<Presentation className={ic} />} title="Sensibilisation et formation" desc="Séances, thèmes, participants" meta={n('sensibilisation')} onClick={() => onRegistre('sensibilisation')} />
+        {on('cuisine') && <HubRow tone="ochre" icon={<Thermometer className={ic} />} title="Relevés de température" desc="Frigos, réception, cuisson, maintien" onClick={onCuisineReleves} />}
+        {on('sensibilisation') && <HubRow tone="plum" icon={<Presentation className={ic} />} title="Sensibilisation et formation" desc="Séances, thèmes, participants" meta={n('sensibilisation')} onClick={() => onRegistre('sensibilisation')} />}
       </section>
       <section>
         <HubTitle>Audits</HubTitle>
         <HubRow tone="pine" icon={<ClipboardCheck className={ic} />} title="Audit rapide" desc="5 composantes, tableau 20 du guide" onClick={onAuditRapide} />
         <HubRow tone="sea" icon={<Layers className={ic} />} title="Audit complet" desc="Version détaillée, tableau 21 du guide" onClick={onAuditComplet} />
-        <HubRow tone="ochre" icon={<ChefHat className={ic} />} title="Audit cuisine (HACCP)" desc="Supervision de la restauration" onClick={onCuisineAudit} />
+        {on('cuisine') && <HubRow tone="ochre" icon={<ChefHat className={ic} />} title="Audit cuisine (HACCP)" desc="Supervision de la restauration" onClick={onCuisineAudit} />}
         <HubRow tone="plum" icon={<ListChecks className={ic} />} title="Historique des audits" desc="Rapports, modification, suppression" meta={String(nbAudits)} onClick={onHistorique} />
       </section>
     </div>
@@ -147,13 +152,14 @@ export const PlusHub: React.FC<{
   initiales: string;
   sousTitre: string;
   onProfil: () => void;
+  onConfigurer: () => void;
   onFiches: () => void;
   onGlossaire: () => void;
   onAes: () => void;
   onReglages: () => void;
   onTutoriel: () => void;
   onAPropos: () => void;
-}> = ({ nom, initiales, sousTitre, onProfil, onFiches, onGlossaire, onAes, onReglages, onTutoriel, onAPropos }) => (
+}> = ({ nom, initiales, sousTitre, onProfil, onConfigurer, onFiches, onGlossaire, onAes, onReglages, onTutoriel, onAPropos }) => (
   <div className="space-y-6 pb-6">
     <HubHeader title="Plus" subtitle="Profil, références, réglages et aide" />
     <button
@@ -168,6 +174,10 @@ export const PlusHub: React.FC<{
       </span>
       <ChevronRight className="w-4 h-4 text-muted-custom shrink-0" />
     </button>
+    <section>
+      <HubTitle>Mon travail</HubTitle>
+      <HubRow tone="pine" icon={<SlidersHorizontal className={ic} />} title="Configurer mon application" desc="Ce que je suis, mes services, mon plan d’action" onClick={onConfigurer} />
+    </section>
     <section>
       <HubTitle>Références</HubTitle>
       <HubRow tone="pine" icon={<BookOpen className={ic} />} title="Fiches pratiques" desc="Mains, EPI, bionettoyage, dilutions" onClick={onFiches} />

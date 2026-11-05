@@ -30,6 +30,7 @@ import { AProposModal } from './components/AProposModal';
 import { DataSettingsModal } from './components/DataSettingsModal';
 import { TutorialModal } from './components/TutorialModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { ConfigurationWizard } from './components/ConfigurationWizard';
 import { storageService } from './services/storageService';
 import { extrasService } from './services/extrasService';
 import { RegistreId } from './data/thmData';
@@ -61,6 +62,7 @@ export default function App() {
   const [registreAuto, setRegistreAuto] = useState(false);
   const [journalEdit, setJournalEdit] = useState(false);
   const [auditResume, setAuditResume] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [cuisineTab, setCuisineTab] = useState<'releves' | 'audit' | 'fiches'>('releves');
 
@@ -326,6 +328,7 @@ export default function App() {
             initiales={initiales(storageService.getSettings().userName)}
             sousTitre={[storageService.getSettings().userRole, storageService.getSettings().etablissement].filter(Boolean).join(' · ') || 'Identité et historique'}
             onProfil={() => go('profil')}
+            onConfigurer={() => setIsConfigOpen(true)}
             onFiches={() => go('fiches')}
             onGlossaire={() => setIsGlossaireOpen(true)}
             onAes={() => setIsAesOpen(true)}
@@ -341,6 +344,7 @@ export default function App() {
             onOpenJournal={() => { setJournalEdit(false); go('journal'); }}
             onAddTask={() => { setJournalEdit(true); go('journal'); }}
             onResumeAudit={handleResumeAudit}
+            onConfigurer={() => setIsConfigOpen(true)}
             onOpenPlan={() => go('plan')}
             onOpenRegistre={openRegistre}
             onNewAudit={() => handleStartNewAudit('courte')}
@@ -370,6 +374,21 @@ export default function App() {
         onComplete={() => {
           setIsOnboardingOpen(false);
           refreshData();
+          setIsConfigOpen(true);
+        }}
+      />
+      <ConfigurationWizard
+        isOpen={isConfigOpen}
+        onClose={() => {
+          setIsConfigOpen(false);
+          try { localStorage.setItem('essp_hygiene_config_dismiss_v1', '1'); } catch {}
+          refreshData();
+          openTutorialIfFirstTime();
+        }}
+        onDone={() => {
+          setIsConfigOpen(false);
+          refreshData();
+          handleTabChange('accueil');
           openTutorialIfFirstTime();
         }}
       />

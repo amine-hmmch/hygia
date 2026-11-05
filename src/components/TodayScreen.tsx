@@ -5,12 +5,15 @@ import { thmService } from '../services/thmService';
 import { storageService } from '../services/storageService';
 import { CorrectiveAction } from '../types';
 import { NOMS_MOIS_LONGS, RegistreId } from '../data/thmData';
+import { sujetActif } from '../data/configData';
+import { CONFIG_DISMISS_KEY } from './ConfigurationWizard';
 
 interface Props {
   actions: CorrectiveAction[];
   onOpenJournal: () => void;
   onAddTask: () => void;
   onResumeAudit: () => void;
+  onConfigurer?: () => void;
   onOpenPlan: () => void;
   onOpenRegistre: (id: RegistreId, auto?: boolean) => void;
   onNewAudit: () => void;
@@ -31,7 +34,7 @@ const REPERES = [
 const heureMaintenant = () => new Date().toTimeString().slice(0, 5);
 const isoLocal = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
-export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onResumeAudit, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
+export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onResumeAudit, onConfigurer, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
   const [tick, setTick] = useState(0);
   const [toutesAlertes, setToutesAlertes] = useState(false);
   const [repereOuvert, setRepereOuvert] = useState(false);
@@ -60,19 +63,22 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
   );
   const repere = REPERES[Math.floor(Date.now() / 86400000) % REPERES.length];
 
+  const su = settings.sujets;
+  let configIgnoree = false;
+  try { configIgnoree = localStorage.getItem(CONFIG_DISMISS_KEY) === '1'; } catch {}
   const alertes: { texte: string; onClick: () => void }[] = [];
   if (retard.length)
     alertes.push({ texte: `${retard.length} action${retard.length > 1 ? 's' : ''} corrective${retard.length > 1 ? 's' : ''} en retard`, onClick: onOpenActions });
-  if (!extrasService.chloreFaitCetteSemaine())
+  if (sujetActif(su, 'eau') && !extrasService.chloreFaitCetteSemaine())
     alertes.push({ texte: 'Test de chlore de la semaine pas encore fait', onClick: () => onOpenRegistre('eau', true) });
   if (extrasService.backupDue() && onOpenReglages)
     alertes.push({ texte: 'Pense à faire une sauvegarde (plus de 7 jours)', onClick: onOpenReglages });
-  if (prelevAttente.length)
+  if (sujetActif(su, 'prelevements') && prelevAttente.length)
     alertes.push({ texte: `${prelevAttente.length} prélèvement${prelevAttente.length > 1 ? 's' : ''} en attente de résultat`, onClick: () => onOpenRegistre('prelevements') });
 
   const rapide: { label: string; icon: React.ElementType; onClick: () => void }[] = [
-    { label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau', true) },
-    { label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements', true) },
+    ...(sujetActif(su, 'eau') ? [{ label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau', true) }] : []),
+    ...(sujetActif(su, 'prelevements') ? [{ label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements', true) }] : []),
     { label: 'Note', icon: NotebookPen, onClick: onOpenJournal },
     { label: 'Audit', icon: ClipboardCheck, onClick: onNewAudit },
   ];
@@ -90,7 +96,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
       </section>
 
       {/* Accès rapide */}
-      <section className="rise grid grid-cols-4 gap-2" style={{ animationDelay: '60ms' }}>
+      <section className="rise grid gap-2" style={{ animationDelay: '60ms', gridTemplateColumns: `repeat(${rapide.length}, minmax(0, 1fr))` }}>
         {rapide.map(({ label, icon: Icon, onClick }) => (
           <button
             key={label}
@@ -102,6 +108,20 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
           </button>
         ))}
       </section>
+
+      {onConfigurer && !settings.configure && !configIgnoree && (
+        <section className="rise">
+          <div className="rounded-lg border border-medium bg-card px-3.5 py-3 space-y-2">
+            <p className="text-[14px] text-main leading-snug">
+              <span className="font-medium">Règle l’application pour ton travail.</span> Quelques questions sur ce que tu suis et ton plan d’action de l’année, et je prépare le reste.
+            </p>
+            <div className="flex gap-2">
+              <button onClick={onConfigurer} className="min-h-[44px] px-4 rounded-lg bg-primary text-white dark:text-[#10201a] text-[14px] font-medium">Configurer (2 min)</button>
+              <button onClick={() => { try { localStorage.setItem(CONFIG_DISMISS_KEY, '1'); } catch {} setTick((t) => t + 1); }} className="min-h-[44px] px-3 text-[14px] text-sub">Plus tard</button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {brouillon && (
         <section className="rise">
