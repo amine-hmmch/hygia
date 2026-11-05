@@ -184,6 +184,10 @@ export interface PlanAnnuel {
   activites: Activite[];
   /** premier mois suivi (0 = janvier) : avant, rien n'est compté en retard */
   suiviDepuis?: number;
+  /** true dès que l'utilisateur a choisi ou modifié son plan (sinon : plan type proposé tel quel). */
+  choisi?: boolean;
+  /** axes ajoutés par l'utilisateur */
+  axesPerso?: string[];
   updatedAt: string;
 }
 

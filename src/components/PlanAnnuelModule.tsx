@@ -26,6 +26,8 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [printing, setPrinting] = useState(false);
+  const [choixPlan, setChoixPlan] = useState<'vide' | 'copie' | null>(null);
+  const [nouvelAxe, setNouvelAxe] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   useEffect(() => setPlan(thmService.getPlan(annee)), [annee]);
@@ -39,7 +41,7 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const moisCourant = annee === now.getFullYear() ? now.getMonth() : annee < now.getFullYear() ? 11 : -1;
 
   const persist = (p: PlanAnnuel) => {
-    setPlan(p);
+    setPlan({ ...p, choisi: true });
     thmService.savePlan(p);
     setTick((t) => t + 1);
   };
@@ -146,7 +148,15 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const setNum = (arr: number[], m: number, v: number) => arr.map((x, i) => (i === m ? Math.max(0, v) : x));
   const nomAxeCourt = (axe: string) => axe.split(' ').slice(0, 3).join(' ');
 
-  const axes = [...AXES, ...plan.activites.map((a) => a.axe).filter((x) => !AXES.includes(x))].filter((x, i, arr) => arr.indexOf(x) === i);
+  const axes = [...AXES, ...(plan.axesPerso || []), ...plan.activites.map((a) => a.axe)].filter((x, i, arr) => arr.indexOf(x) === i);
+  const ajouterAxe = () => {
+    const nom = (nouvelAxe || '').trim();
+    if (!nom || axes.some((x) => x.toLowerCase() === nom.toLowerCase())) { setNouvelAxe(null); return; }
+    persist({ ...plan, axesPerso: [...(plan.axesPerso || []), nom] });
+    setOpenAxe(nom);
+    setNouvelAxe(null);
+  };
+  const planPrecedent = thmService.hasPlan(annee - 1);
 
   /* ---------------------------- Fiche d'une activité ---------------------------- */
   const sheet =
@@ -346,6 +356,21 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
         </select>
       </label>
 
+      {!plan.choisi && (
+        <section className="rounded-lg border border-warning-border bg-warning-tint p-3.5 space-y-2.5">
+          <p className="text-[14px] text-main leading-snug">
+            <span className="font-semibold">Plan prêt à l’emploi.</span> C’est le plan type du technicien d’hygiène du milieu. Garde-le, modifie-le activité par activité, ou pars d’autre chose.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => persist(plan)} className="min-h-[44px] px-4 rounded-lg bg-primary text-white dark:text-[#10201a] text-[14px] font-medium">Garder ce plan</button>
+            <button onClick={() => setChoixPlan('vide')} className="min-h-[44px] px-4 rounded-lg border border-medium text-[14px] text-main">Créer le mien</button>
+            {planPrecedent && (
+              <button onClick={() => setChoixPlan('copie')} className="min-h-[44px] px-4 rounded-lg border border-medium text-[14px] text-main">Reprendre {annee - 1}</button>
+            )}
+          </div>
+        </section>
+      )}
+
       {annee === now.getFullYear() && (
         <section>
           <h3 className="label-caps pb-2 border-b border-medium">À faire en {NOMS_MOIS_LONGS[now.getMonth()]}</h3>
@@ -411,6 +436,24 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
             </div>
           );
         })}
+        {nouvelAxe === null ? (
+          <button onClick={() => setNouvelAxe('')} className="mt-2 text-[13px] text-primary font-medium flex items-center gap-1 py-1.5">
+            <Plus className="w-4 h-4" /> Ajouter un axe
+          </button>
+        ) : (
+          <div className="mt-2 flex gap-2">
+            <input
+              autoFocus
+              className={inputCls}
+              aria-label="Nom du nouvel axe"
+              placeholder="ex. Hygiène du bloc opératoire"
+              value={nouvelAxe}
+              onChange={(e) => setNouvelAxe(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && ajouterAxe()}
+            />
+            <button onClick={ajouterAxe} disabled={!nouvelAxe.trim()} className="px-4 rounded-lg bg-primary text-white dark:text-[#10201a] text-[14px] font-medium disabled:opacity-40">Ajouter</button>
+          </div>
+        )}
         <div className="flex items-center gap-3 text-[11px] text-sub pt-3">
           <span className="flex items-center gap-1"><i className="w-2.5 h-2 rounded-[2px] inline-block bg-[var(--color-success)]" /> fait</span>
           <span className="flex items-center gap-1"><i className="w-2.5 h-2 rounded-[2px] inline-block bg-[var(--color-warning)]" /> en partie</span>
@@ -420,7 +463,7 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
       </section>
 
       <button onClick={() => setConfirmReset(true)} className="text-[12px] text-sub flex items-center gap-1.5">
-        <RotateCcw className="w-3.5 h-3.5" /> Revenir au plan type
+        <RotateCcw className="w-3.5 h-3.5" /> Revenir au plan type prêt à l’emploi
       </button>
 
       {sheet}
@@ -433,6 +476,22 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
         confirmLabel="Remplacer"
         onConfirm={() => { setPlan(thmService.resetPlan(annee)); setConfirmReset(false); setTick((t) => t + 1); }}
         onCancel={() => setConfirmReset(false)}
+      />
+      <ConfirmModal
+        isOpen={choixPlan === 'vide'}
+        title="Créer ton propre plan ?"
+        message={`Le plan ${annee} sera vide : tu ajoutes tes activités axe par axe. Le plan type sera remplacé (les registres ne sont pas touchés).`}
+        confirmLabel="Plan vide"
+        onConfirm={() => { setPlan(thmService.planVide(annee)); setChoixPlan(null); setTick((t) => t + 1); }}
+        onCancel={() => setChoixPlan(null)}
+      />
+      <ConfirmModal
+        isOpen={choixPlan === 'copie'}
+        title={`Reprendre le plan ${annee - 1} ?`}
+        message={`Les activités et les mois prévus de ${annee - 1} sont copiés dans ${annee}. Les chiffres saisis à la main repartent à zéro. Tu pourras tout modifier.`}
+        confirmLabel="Reprendre"
+        onConfirm={() => { setPlan(thmService.copierPlan(annee - 1, annee)); setChoixPlan(null); setTick((t) => t + 1); }}
+        onCancel={() => setChoixPlan(null)}
       />
       <ConfirmModal
         isOpen={confirmDelete}

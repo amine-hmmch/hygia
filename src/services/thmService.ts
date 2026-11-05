@@ -150,7 +150,31 @@ export const thmService = {
     return plan;
   },
   savePlan(plan: PlanAnnuel) {
-    write(planKey(plan.annee), { ...plan, updatedAt: new Date().toISOString() });
+    write(planKey(plan.annee), { ...plan, choisi: true, updatedAt: new Date().toISOString() });
+  },
+  hasPlan(annee: number): boolean {
+    const p = read<PlanAnnuel | null>(planKey(annee), null);
+    return !!p && Array.isArray(p.activites);
+  },
+  /** Plan sans aucune activité : l'utilisateur construit le sien. */
+  planVide(annee: number): PlanAnnuel {
+    const plan: PlanAnnuel = { annee, activites: [], suiviDepuis: annee === new Date().getFullYear() ? new Date().getMonth() : 0, choisi: true, updatedAt: new Date().toISOString() };
+    write(planKey(annee), plan);
+    return plan;
+  },
+  /** Reprend le plan d'une autre année : mêmes activités et mêmes mois prévus, réalisé manuel remis à zéro. */
+  copierPlan(deAnnee: number, versAnnee: number): PlanAnnuel {
+    const src = this.getPlan(deAnnee);
+    const plan: PlanAnnuel = {
+      ...src,
+      annee: versAnnee,
+      suiviDepuis: versAnnee === new Date().getFullYear() ? new Date().getMonth() : 0,
+      activites: src.activites.map((a) => ({ ...a, id: `act_${uid()}`, prevu: [...a.prevu], manuel: Array(12).fill(0) })),
+      choisi: true,
+      updatedAt: new Date().toISOString(),
+    };
+    write(planKey(versAnnee), plan);
+    return plan;
   },
   resetPlan(annee: number): PlanAnnuel {
     const plan = planParDefaut(annee);
