@@ -33,6 +33,8 @@ const isoLocal = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 600
 
 export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask, onResumeAudit, onOpenPlan, onOpenRegistre, onNewAudit, onOpenActions, onOpenReglages }) => {
   const [tick, setTick] = useState(0);
+  const [toutesAlertes, setToutesAlertes] = useState(false);
+  const [repereOuvert, setRepereOuvert] = useState(false);
   const settings = storageService.getSettings();
   const d0 = storageService.getAuditDraft();
   const nBrouillon = d0 ? Object.values(d0.responses).filter((r) => r.value !== null).length : 0;
@@ -69,7 +71,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
     alertes.push({ texte: `${prelevAttente.length} prélèvement${prelevAttente.length > 1 ? 's' : ''} en attente de résultat`, onClick: () => onOpenRegistre('prelevements') });
 
   const rapide: { label: string; icon: React.ElementType; onClick: () => void }[] = [
-    { label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau') },
+    { label: 'Eau', icon: Droplets, onClick: () => onOpenRegistre('eau', true) },
     { label: 'Prélèvement', icon: FlaskConical, onClick: () => onOpenRegistre('prelevements', true) },
     { label: 'Note', icon: NotebookPen, onClick: onOpenJournal },
     { label: 'Audit', icon: ClipboardCheck, onClick: onNewAudit },
@@ -119,7 +121,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
 
       {alertes.length > 0 && (
         <section className="rise space-y-2" style={{ animationDelay: '100ms' }}>
-          {alertes.map((a) => (
+          {(toutesAlertes ? alertes : alertes.slice(0, 2)).map((a) => (
             <button
               key={a.texte}
               onClick={a.onClick}
@@ -130,6 +132,11 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
               <ChevronRight className="w-4 h-4 shrink-0" />
             </button>
           ))}
+          {alertes.length > 2 && (
+            <button onClick={() => setToutesAlertes(!toutesAlertes)} className="text-[13px] text-primary font-medium py-1">
+              {toutesAlertes ? 'Voir moins' : `Voir les ${alertes.length - 2} autre${alertes.length - 2 > 1 ? 's' : ''} alerte${alertes.length - 2 > 1 ? 's' : ''}`}
+            </button>
+          )}
         </section>
       )}
 
@@ -142,7 +149,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
         {taches.length === 0 ? (
           <p className="py-4 text-sm text-sub">Aucune tâche pour aujourd’hui.</p>
         ) : (
-          taches.slice(0, 6).map(({ tache, fait }) => (
+          taches.slice(0, 4).map(({ tache, fait }) => (
             <button
               key={tache.id}
               onClick={() => { thmService.basculerTache(date, tache.id, heureMaintenant()); setTick((t) => t + 1); }}
@@ -158,7 +165,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
         )}
         <div className="pt-3 flex items-center justify-between gap-3">
           <button onClick={onOpenJournal} className="text-[13px] text-primary font-medium flex items-center gap-1">
-            {taches.length > 6 ? `Voir les ${taches.length} tâches et le carnet` : 'Ouvrir le carnet de bord'} <ChevronRight className="w-4 h-4" />
+            {taches.length > 4 ? `Voir les ${taches.length} tâches et le carnet` : 'Ouvrir le carnet de bord'} <ChevronRight className="w-4 h-4" />
           </button>
           <button onClick={onAddTask} className="min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
             <Plus className="w-4 h-4" /> Ajouter une tâche
@@ -176,15 +183,15 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
           <p className="py-4 text-sm text-sub">Le plan du mois est à jour.</p>
         ) : (
           <>
-            {plan.slice(0, 4).map(({ activite, prevu, fait }) => (
+            {plan.slice(0, 2).map(({ activite, prevu, fait }) => (
               <button key={activite.id} onClick={onOpenPlan} className="row-rule w-full py-3 flex items-center gap-3 text-start">
                 <span className="flex-1 text-[15px] text-main leading-snug">{activite.titre}</span>
                 <span className="font-mono text-sm text-sub shrink-0">{fait}/{prevu}</span>
               </button>
             ))}
-            {plan.length > 4 && (
+            {plan.length > 2 && (
               <button onClick={onOpenPlan} className="pt-2 text-[13px] text-primary font-medium">
-                + {plan.length - 4} autre{plan.length - 4 > 1 ? 's' : ''} activité{plan.length - 4 > 1 ? 's' : ''}
+                + {plan.length - 2} autre{plan.length - 2 > 1 ? 's' : ''} activité{plan.length - 2 > 1 ? 's' : ''}
               </button>
             )}
           </>
@@ -193,9 +200,11 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
 
       {/* Repère */}
       <section className="rise border-s-2 border-primary ps-4 py-0.5" style={{ animationDelay: '220ms' }}>
-        <p className="label-caps">Repère du jour</p>
-        <p className="font-serif-display text-[18px] leading-snug text-main mt-1.5" style={{ fontWeight: 500 }}>{repere.titre}</p>
-        <p className="text-[13px] text-sub leading-snug mt-1">{repere.texte}</p>
+        <button onClick={() => setRepereOuvert(!repereOuvert)} aria-expanded={repereOuvert} className="w-full text-start">
+          <p className="label-caps">Repère du jour</p>
+          <p className="font-serif-display text-[18px] leading-snug text-main mt-1.5" style={{ fontWeight: 500 }}>{repere.titre}</p>
+        </button>
+        {repereOuvert && <p className="text-[13px] text-sub leading-snug mt-1">{repere.texte}</p>}
       </section>
     </div>
   );

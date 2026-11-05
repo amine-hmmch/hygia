@@ -79,6 +79,7 @@ const inputCls =
 const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: boolean }> = ({ def, onBack, autoOpen }) => {
   const { showToast } = useToast();
   const [entrees, setEntrees] = useState<RegistreEntree[]>(() => thmService.getRegistre(def.id));
+  const [details, setDetails] = useState(false);
   const [open, setOpen] = useState(false);
   const [vals, setVals] = useState<Record<string, string>>({});
   const [date, setDate] = useState(today());
@@ -100,11 +101,14 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
     }
     if (def.champs.some((c) => c.id === 'operateur') && !v.operateur) v.operateur = operateurDefaut;
     setVals(v);
+    setDetails(false);
     setDate(today());
     setHeure(nowTime());
     setOpen(true);
   };
 
+  const OPTIONNELS = ['observation', 'laboratoire', 'operateur', 'intervenant', 'animateur', 'produit'];
+  const estOptionnel = (c: { id: string; requis?: boolean }) => OPTIONNELS.includes(c.id) && !c.requis;
   const visible = (c: { si?: { champ: string; valeurs: string[] } }) => !c.si || c.si.valeurs.includes(vals[c.si.champ] ?? '');
   const brut = (): Record<string, any> => {
     const o: Record<string, any> = {};
@@ -135,6 +139,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
     } else {
       showToast('Enregistré', 'success');
     }
+    if (autoOpen) onBack();
   };
 
   const exporter = () => {
@@ -187,7 +192,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
         </button>
       ) : (
         <div className="border border-medium rounded-lg p-4 space-y-3 bg-card no-print">
-          {def.champs.filter(visible).map((c) => (
+          {def.champs.filter((c) => visible(c) && (!estOptionnel(c) || details)).map((c) => (
             <label key={c.id} className="block">
               <span className="label-caps block mb-1">
                 {c.label}
@@ -236,6 +241,11 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
               )}
             </label>
           ))}
+          {!details && def.champs.some((c) => visible(c) && estOptionnel(c)) && (
+            <button type="button" onClick={() => setDetails(true)} className="text-[14px] text-primary font-medium flex items-center gap-1.5 py-1">
+              <Plus className="w-4 h-4" /> Ajouter des détails
+            </button>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
               <span className="label-caps block mb-1">Date</span>
