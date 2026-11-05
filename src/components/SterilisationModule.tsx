@@ -209,7 +209,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
           {onBackToHome && (
             <button
               onClick={onBackToHome}
-              className="px-3 py-1.5 rounded-xl bg-card-subtle hover:bg-card-hover text-sub font-semibold text-xs transition border border-soft"
+              className="px-3 py-1.5 min-h-[44px] rounded-xl bg-card-subtle hover:bg-card-hover text-sub font-semibold text-xs transition border border-soft"
             >
               ← Retour Accueil
             </button>
@@ -221,7 +221,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
       <div className="no-print flex items-center gap-1 p-1 bg-card-subtle rounded-2xl border border-soft text-[11px] sm:text-xs overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveSubTab('registre')}
-          className={`flex-1 min-w-[90px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
+          className={`flex-1 min-w-[90px] min-h-[44px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
             activeSubTab === 'registre'
               ? 'bg-rose-600 text-white shadow-md'
               : 'text-sub hover:text-main'
@@ -233,7 +233,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
 
         <button
           onClick={() => setActiveSubTab('formulaire')}
-          className={`flex-1 min-w-[90px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
+          className={`flex-1 min-w-[90px] min-h-[44px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
             activeSubTab === 'formulaire'
               ? 'bg-rose-600 text-white shadow-md'
               : 'text-sub hover:text-main'
@@ -245,7 +245,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
 
         <button
           onClick={() => setActiveSubTab('procedure')}
-          className={`flex-1 min-w-[90px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
+          className={`flex-1 min-w-[90px] min-h-[44px] py-2 px-1.5 rounded-xl font-bold transition flex items-center justify-center gap-1 whitespace-nowrap ${
             activeSubTab === 'procedure'
               ? 'bg-rose-600 text-white shadow-md'
               : 'text-sub hover:text-main'
@@ -300,7 +300,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
               <div className="flex items-center bg-card rounded-xl p-1 border border-soft text-xs">
                 <button
                   onClick={() => setConformiteFilter('all')}
-                  className={`flex-1 py-1 rounded-lg font-semibold transition ${
+                  className={`flex-1 min-h-[44px] py-1 rounded-lg font-semibold transition ${
                     conformiteFilter === 'all' ? 'bg-card-hover text-main' : 'text-sub'
                   }`}
                 >
@@ -308,7 +308,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
                 </button>
                 <button
                   onClick={() => setConformiteFilter('conforme')}
-                  className={`flex-1 py-1 rounded-lg font-semibold transition ${
+                  className={`flex-1 min-h-[44px] py-1 rounded-lg font-semibold transition ${
                     conformiteFilter === 'conforme'
                       ? 'bg-emerald-600 text-white'
                       : 'text-emerald-700 dark:text-emerald-400'
@@ -318,7 +318,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
                 </button>
                 <button
                   onClick={() => setConformiteFilter('non_conforme')}
-                  className={`flex-1 py-1 rounded-lg font-semibold transition ${
+                  className={`flex-1 min-h-[44px] py-1 rounded-lg font-semibold transition ${
                     conformiteFilter === 'non_conforme'
                       ? 'bg-rose-600 text-white'
                       : 'text-rose-700 dark:text-rose-400'
@@ -344,7 +344,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
               </p>
               <button
                 onClick={() => setActiveSubTab('formulaire')}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition"
+                className="px-4 py-2 min-h-[44px] bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition"
               >
                 Créer un nouveau cycle
               </button>

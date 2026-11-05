@@ -48,7 +48,7 @@ export const QuickAddSheet: React.FC<Props> = ({ isOpen, onClose, onPick }) => {
       >
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-serif-display text-[22px] text-main">Que veux-tu noter ?</h2>
-          <button onClick={onClose} aria-label="Fermer" className="w-10 h-10 -me-2 flex items-center justify-center text-sub">
+          <button onClick={onClose} aria-label="Fermer" className="w-11 h-11 -me-2 flex items-center justify-center text-sub">
             <X className="w-5 h-5" />
           </button>
         </div>

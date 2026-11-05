@@ -282,7 +282,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
   const fieldCls =
     'w-full min-h-[44px] px-3 py-2 rounded-lg bg-card border border-medium text-main text-[15px] focus:outline-none focus:border-primary';
   const smallField =
-    'w-full min-h-[40px] text-[13px] px-2.5 py-1.5 rounded-lg bg-card border border-medium text-main focus:outline-none focus:border-primary';
+    'w-full min-h-[44px] text-[13px] px-2.5 py-1.5 rounded-lg bg-card border border-medium text-main focus:outline-none focus:border-primary';
 
   const scoreTone = (n: number) => (n >= 80 ? 'text-success' : n >= 50 ? 'text-warning' : 'text-danger');
 
@@ -332,7 +332,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
           <button
             type="button"
             onClick={() => setOpenNotes((p) => ({ ...p, [item.id]: true }))}
-            className="mt-2 text-[12px] text-sub flex items-center gap-1"
+            className="mt-1 min-h-[44px] text-[12px] text-sub flex items-center gap-1"
           >
             <MessageSquare className="w-3.5 h-3.5" /> Ajouter une note
           </button>
@@ -440,7 +440,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
       {/* Barre de progression collante */}
       <div className="sticky top-[57px] z-20 bg-surface -mx-4 px-4 pt-2 pb-2.5 border-b border-soft">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <button onClick={onCancel} className="h-10 -ms-2 px-2 flex items-center gap-1 text-[14px] text-sub">
+          <button onClick={onCancel} className="h-11 -ms-2 px-2 flex items-center gap-1 text-[14px] text-sub">
             <ChevronLeft className="w-4 h-4" />
             Retour
           </button>
@@ -450,7 +450,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
           </p>
           <button
             onClick={() => handleSaveAudit(true)}
-            className="h-10 -me-2 px-2 flex items-center gap-1.5 text-[14px] text-sub"
+            className="h-11 -me-2 px-2 flex items-center gap-1.5 text-[14px] text-sub"
             title="Enregistrer comme brouillon"
           >
             <Save className="w-4 h-4" />
@@ -476,7 +476,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
               key={vv}
               type="button"
               onClick={() => setVersion(vv)}
-              className={`h-10 rounded-md text-[13px] font-medium ${
+              className={`h-11 rounded-md text-[13px] font-medium ${
                 version === vv ? 'bg-card text-main border border-medium' : 'text-sub'
               }`}
             >
@@ -489,7 +489,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1">
               <span className="label-caps">Service</span>
-              <button type="button" onClick={() => setShowAddService(!showAddService)} className="text-[12px] text-primary font-medium">
+              <button type="button" onClick={() => setShowAddService(!showAddService)} className="text-[12px] text-primary font-medium min-h-[44px] px-2 -me-2">
                 + Nouveau
               </button>
             </div>

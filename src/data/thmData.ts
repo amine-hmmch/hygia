@@ -230,6 +230,59 @@ const a = (
   source,
 });
 
+/* ---------- Plan type « district sanitaire » ----------
+ * Structure inspirée du modèle de plan d'action santé-environnement des délégations provinciales
+ * (exemple : plan 2024 de la province de Sidi Ifni, fourni par l'utilisateur).
+ * Seules les rubriques sont reprises : aucun effectif ni objectif chiffré (ils sont propres à chaque province).
+ * Le rythme par défaut (un point par trimestre) n'est qu'un point de départ à ajuster.
+ */
+export const AXES_DISTRICT = [
+  'Contrôle sanitaire des eaux à usage alimentaire',
+  'Plages propres (volet santé-environnement)',
+  'Hygiène alimentaire',
+  'Lutte contre les vecteurs',
+  'Salubrité de l’environnement',
+  'Formation et sensibilisation',
+];
+
+export function planDistrict(annee: number, responsable = 'Technicien de santé environnement'): PlanAnnuel {
+  let k = 0;
+  const T = mois(3, 6, 9, 12);
+  const d = (axe: number, titre: string, outil: string, indicateur: string, source?: SourceAuto): Activite => ({
+    id: `actd_${++k}`, axe: AXES_DISTRICT[axe], titre, outil, indicateur, responsable, prevu: [...T], manuel: Z(), source,
+  });
+  return {
+    annee,
+    suiviDepuis: annee === new Date().getFullYear() ? new Date().getMonth() : 0,
+    updatedAt: new Date().toISOString(),
+    axes: [...AXES_DISTRICT],
+    activites: [
+      d(0, 'Prélèvements sur les réseaux d’approvisionnement (types 1 et 2, réduits et complets)', 'Bulletins de prélèvements', 'Prélèvements réalisés / programmés, non conformes', 'prelev_eau'),
+      d(0, 'Inspections sanitaires des systèmes d’approvisionnement par réseau', 'Fiche d’inspection', 'Inspections réalisées / programmées'),
+      d(0, 'Tests de chlore aux points d’eau collectifs suivis (PECS)', 'Registre de chlore', 'Tests réalisés / programmés', 'eau_chlore'),
+      d(0, 'Prélèvements et inspections des points d’eau collectifs suivis', 'Bulletins de prélèvements, fiche d’inspection', 'Réalisés / programmés'),
+      d(0, 'Contrôle des stations d’épuration des eaux usées (STEP)', 'Fiche d’inspection, bulletins de prélèvements', 'Inspections et prélèvements réalisés / programmés'),
+      d(1, 'Prélèvements d’eau de baignade et inspection des équipements sanitaires des plages', 'Circulaire annuelle « plages propres »', 'Réalisés / programmés'),
+      d(1, 'Désinfection des locaux et inspection des établissements alimentaires des plages', 'Fiche d’inspection', 'Réalisés / programmés'),
+      d(1, 'Séances d’éducation sanitaire sur les plages', 'Rapport de séance', 'Séances réalisées / programmées', 'seances'),
+      d(2, 'Inspections des établissements alimentaires (restauration collective, vente au détail, restauration sociale, hôtels)', 'Grille d’inspection', 'Inspections réalisées / programmées'),
+      d(2, 'Analyses microbiologiques des aliments', 'Bulletins de prélèvements', 'Prélèvements réalisés / programmés, non conformes', 'prelev_aliment'),
+      d(2, 'Surveillance médicale des manipulateurs d’aliments', 'Registre de suivi médical', 'Manipulateurs suivis / existants'),
+      d(2, 'Réunions de la cellule locale de veille sanitaire (gestion des TIAC)', 'Compte rendu de réunion', 'Réunions tenues / prévues'),
+      d(2, 'Contrôle des eaux minérales, de source et de table', 'Fiche d’inspection', 'Contrôles réalisés / programmés'),
+      d(3, 'Prospection des gîtes larvaires et stations de surveillance', 'Fiche de prospection', 'Gîtes prospectés, gîtes positifs'),
+      d(3, 'Lutte contre les vecteurs, les réservoirs et les hôtes intermédiaires', 'Fiche d’intervention', 'Gîtes assainis ou traités / programmés'),
+      d(3, 'Opérations de désinfection, désinsectisation et dératisation (hygiène publique)', 'Registre des opérations', 'Opérations réalisées / programmées', 'desins'),
+      d(3, 'Réunions du comité GILAV', 'Compte rendu de réunion', 'Réunions tenues / prévues'),
+      d(4, 'Audits environnementaux des centres de santé (niveaux 1 et 2, urbains et ruraux)', 'Grille d’audit environnemental', 'Centres audités / à auditer'),
+      d(4, 'Contrôle environnemental pour la lutte contre la légionellose (établissements hôteliers)', 'Fiche de contrôle', 'Contrôles réalisés / programmés'),
+      d(4, 'Participation aux comités des études d’impact sur l’environnement', 'Compte rendu de comité', 'Réunions auxquelles tu as participé'),
+      d(5, 'Formation continue en santé-environnement (par ex. infirmiers chefs des centres de santé)', 'Liste de présence', 'Personnes formées / ciblées'),
+      d(5, 'Sensibilisation des élus, associations et population aux risques sanitaires environnementaux', 'Rapport de séance', 'Séances réalisées / programmées', 'seances'),
+    ],
+  };
+}
+
 /** Plan type : à modifier dans l'application. */
 export function planParDefaut(annee: number): PlanAnnuel {
   n = 0;

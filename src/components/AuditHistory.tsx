@@ -52,7 +52,7 @@ export const AuditHistory: React.FC<Props> = ({ audits, onNewAudit, onViewAudit,
           <button
             key={k}
             onClick={() => setVersion(k)}
-            className={`h-9 rounded-md text-[13px] font-medium ${version === k ? 'bg-card text-main border border-medium' : 'text-sub'}`}
+            className={`h-11 rounded-md text-[13px] font-medium ${version === k ? 'bg-card text-main border border-medium' : 'text-sub'}`}
           >
             {l}
           </button>

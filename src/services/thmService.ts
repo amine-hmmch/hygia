@@ -1,4 +1,4 @@
-import { PlanAnnuel, planParDefaut, SOURCE_LABEL, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
+import { PlanAnnuel, planParDefaut, planDistrict, SOURCE_LABEL, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
 import { storageService } from './storageService';
 import { cuisineService } from './cuisineService';
 import { safeSetItem } from '../utils/safeStorage';
@@ -12,6 +12,11 @@ export interface RegistreEntree {
 }
 
 const regKey = (id: RegistreId) => `essp_hygiene_reg_${id}_v1`;
+/** Plan type selon le lieu de travail choisi dans l'assistant. */
+function planTypePourNiveau(annee: number): PlanAnnuel {
+  const niveau = storageService.getSettings().niveau;
+  return niveau === 'district' ? planDistrict(annee, storageService.getSettings().userRole || undefined) : planParDefaut(annee);
+}
 const planKey = (annee: number) => `essp_hygiene_plan_${annee}_v1`;
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
@@ -146,7 +151,7 @@ export const thmService = {
   getPlan(annee: number): PlanAnnuel {
     const stored = read<PlanAnnuel | null>(planKey(annee), null);
     if (stored && Array.isArray(stored.activites)) return stored;
-    const plan = planParDefaut(annee);
+    const plan = planTypePourNiveau(annee);
     write(planKey(annee), plan);
     return plan;
   },
@@ -230,7 +235,7 @@ export const thmService = {
     return { ok: true, message: 'Plan importé.', nb: activites.length };
   },
   resetPlan(annee: number): PlanAnnuel {
-    const plan = planParDefaut(annee);
+    const plan = planTypePourNiveau(annee);
     write(planKey(annee), plan);
     return plan;
   },

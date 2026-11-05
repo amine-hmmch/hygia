@@ -76,7 +76,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Ex : Dr. Bennani"
-                className="w-full min-h-[40px] px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#232724] border border-slate-200 dark:border-[#2D322E] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs focus:outline-none focus:border-[#1F5A43]"
+                className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#232724] border border-slate-200 dark:border-[#2D322E] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs focus:outline-none focus:border-[#1F5A43]"
               />
             </div>
             <div>
@@ -90,7 +90,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
                 placeholder="Ex : Technicien d'hygiène du milieu"
-                className="w-full min-h-[40px] px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#232724] border border-slate-200 dark:border-[#2D322E] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs focus:outline-none focus:border-[#1F5A43]"
+                className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#232724] border border-slate-200 dark:border-[#2D322E] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs focus:outline-none focus:border-[#1F5A43]"
               />
             </div>
           </div>

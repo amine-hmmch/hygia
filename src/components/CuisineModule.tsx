@@ -208,7 +208,7 @@ const Releves: React.FC = () => {
             value={graphPoint}
             onChange={(e) => setGraphPoint(e.target.value)}
             aria-label="Point à afficher en courbe"
-            className="w-full h-10 px-2 rounded-lg border border-medium bg-card text-main text-[14px]"
+            className="w-full h-11 px-2 rounded-lg border border-medium bg-card text-main text-[14px]"
           >
             {POINTS_CONTROLE.filter((p) => releves.some((r) => r.pointId === p.id)).map((p) => (
               <option key={p.id} value={p.id}>{p.label}</option>
@@ -435,7 +435,7 @@ const AuditView: React.FC = () => {
                               <button
                                 key={r}
                                 onClick={() => setReponses({ ...reponses, [it.id]: r })}
-                                className={`h-10 rounded-lg border text-sm font-medium ${cls}`}
+                                className={`h-11 rounded-lg border text-sm font-medium ${cls}`}
                               >
                                 {r === 'oui' ? 'Oui' : r === 'non' ? 'Non' : 'N/A'}
                               </button>
@@ -444,7 +444,7 @@ const AuditView: React.FC = () => {
                         </div>
                         {val === 'non' && (
                           <input
-                            className={`${inputCls} mt-2 h-10 text-sm`}
+                            className={`${inputCls} mt-2 h-11 text-sm`}
                             placeholder="Observation / action à mener"
                             value={obs[it.id] || ''}
                             onChange={(e) => setObs({ ...obs, [it.id]: e.target.value })}
@@ -680,7 +680,7 @@ export const CuisineModule: React.FC<{ onBackToHome: () => void; initialTab?: Ta
       <div className="flex items-center gap-3 no-print">
         <button
           onClick={onBackToHome}
-          className="w-10 h-10 -ms-2 rounded-lg flex items-center justify-center text-sub"
+          className="w-10 h-11 -ms-2 rounded-lg flex items-center justify-center text-sub"
           aria-label="Retour à l'accueil"
         >
           <ArrowLeft className="w-5 h-5" />

@@ -204,7 +204,7 @@ export const AProposModal: React.FC<AProposModalProps> = ({ isOpen, onClose }) =
           <span>{APP_NAME} · application indépendante</span>
           <button
             onClick={onClose}
-            className="min-h-[40px] px-4 py-2 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-bold transition text-xs"
+            className="min-h-[44px] px-4 py-2 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-bold transition text-xs"
           >
             Fermer
           </button>

@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Plus, X } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { thmService } from '../services/thmService';
 import { DEFAULT_SERVICES } from '../data/checklistsData';
-import { AXES, Activite, NOMS_MOIS_LONGS, TACHES_PAR_DEFAUT, planParDefaut } from '../data/thmData';
+import { AXES, AXES_DISTRICT, Activite, NOMS_MOIS_LONGS, TACHES_PAR_DEFAUT, planParDefaut, planDistrict } from '../data/thmData';
 import { NIVEAUX, RYTHMES, SUJETS, SujetId, servicesParDefaut, sujetDeActivite, sujetsParDefaut } from '../data/configData';
 
 export const CONFIG_DISMISS_KEY = 'essp_hygiene_config_dismiss_v1';
@@ -53,9 +53,13 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
   const [depuis, setDepuis] = useState(new Date().getMonth());
 
   const propose = useMemo(() => {
+    if (niveau === 'district') {
+      return planDistrict(annee, settings.userRole || undefined).activites.map((a) => ({ a, axeIndex: AXES_DISTRICT.indexOf(a.axe) }));
+    }
     const base = planParDefaut(annee).activites;
     return base.map((a) => ({ a, axeIndex: AXES.indexOf(a.axe) }));
-  }, [annee]);
+  }, [annee, niveau]);
+  const listeAxes = niveau === 'district' ? AXES_DISTRICT : AXES;
 
   const choisirNiveau = (id: string) => {
     setNiveau(id);
@@ -67,7 +71,7 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
   const preparerPlan = () => {
     const i: Record<string, boolean> = {};
     propose.forEach(({ a, axeIndex }) => {
-      const s = sujetDeActivite(a, axeIndex);
+      const s = sujetDeActivite(a, niveau === 'district' ? -1 : axeIndex);
       i[a.id] = !s || sujets.includes(s);
     });
     setIncl(i);
@@ -104,8 +108,8 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
           return { ...a, prevu: r?.prevu ? [...r.prevu] : [...a.prevu], manuel: Array(12).fill(0) };
         });
       const toutes = [...acts, ...autresActs];
-      const axes = [...AXES.filter((x) => toutes.some((a) => a.axe === x)), ...(autresActs.length ? ['Autres activités'] : [])];
-      thmService.savePlan({ ...planParDefaut(annee), activites: toutes, axes, suiviDepuis: depuis });
+      const axes = [...listeAxes.filter((x) => toutes.some((a) => a.axe === x)), ...(autresActs.length ? ['Autres activités'] : [])];
+      thmService.savePlan({ ...(niveau === 'district' ? planDistrict(annee) : planParDefaut(annee)), activites: toutes, axes, suiviDepuis: depuis });
     } else if (modePlan === 'vide') {
       const p = thmService.planVide(annee);
       thmService.savePlan({ ...p, activites: autresActs, axes: autresActs.length ? ['Autres activités'] : [], suiviDepuis: depuis });
@@ -136,7 +140,7 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
     <div className="fixed inset-0 z-[80] bg-surface flex flex-col no-print" role="dialog" aria-modal="true" aria-label="Configurer l’application">
       <div className="px-4 pt-3 pb-2 border-b border-soft flex items-center gap-3">
         {etape > 0 ? (
-          <button onClick={() => setEtape(etape - 1)} aria-label="Étape précédente" className="w-10 h-10 -ms-2 flex items-center justify-center text-sub">
+          <button onClick={() => setEtape(etape - 1)} aria-label="Étape précédente" className="w-11 h-11 -ms-2 flex items-center justify-center text-sub">
             <ArrowLeft className="w-5 h-5" />
           </button>
         ) : (
@@ -148,7 +152,7 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
             <div className="h-1 bg-primary rounded transition-all" style={{ width: `${((etape + 1) / TOTAL) * 100}%` }} />
           </div>
         </div>
-        <button onClick={onClose} className="h-10 px-2 -me-2 text-[14px] text-sub flex items-center gap-1">
+        <button onClick={onClose} className="h-11 px-2 -me-2 text-[14px] text-sub flex items-center gap-1">
           Plus tard <X className="w-4 h-4" />
         </button>
       </div>
@@ -167,7 +171,9 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
               </div>
               {(niveau === 'district' || niveau === 'gst') && (
                 <p className="text-[13px] text-sub rounded-lg border border-soft px-3 py-2.5">
-                  Les outils de supervision des centres ne sont pas encore dans l’application. Tu peux déjà suivre tes propres registres, audits et plan d’action.
+                  {niveau === 'district'
+                    ? 'Un plan d’action type « district » est prêt (eau, plages, hygiène alimentaire, vecteurs, salubrité, formation). Les chiffres à programmer sont les tiens. Les outils de supervision des centres ne sont pas encore dans l’application.'
+                    : 'Les outils de supervision des centres ne sont pas encore dans l’application. Tu peux déjà suivre tes propres registres, audits et plan d’action.'}
                 </p>
               )}
             </>
@@ -238,7 +244,7 @@ export const ConfigurationWizard: React.FC<{ isOpen: boolean; onClose: () => voi
 
               {modePlan === 'generer' && (
                 <div className="space-y-4 pt-1">
-                  {AXES.map((axe, ai) => {
+                  {listeAxes.map((axe, ai) => {
                     const acts = propose.filter((p) => p.axeIndex === ai);
                     if (!acts.length) return null;
                     return (

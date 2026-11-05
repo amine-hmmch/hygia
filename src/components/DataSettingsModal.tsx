@@ -19,6 +19,7 @@ import { storageService, AppSettings } from '../services/storageService';
 import { DEFAULT_SERVICES, GUIDE_REFERENCES } from '../data/checklistsData';
 import { ConfirmModal } from './ConfirmModal';
 import { RappelsPanel } from './RappelsPanel';
+import { loadDemoData } from '../services/demoService';
 import { extrasService } from '../services/extrasService';
 import { useToast } from '../context/ToastContext';
 import { dateLocale } from '../utils/dates';
@@ -149,7 +150,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
 
   // Charger un jeu de données d'exemple génériques
   const handleLoadDemo = () => {
-    storageService.loadDemoData();
+    loadDemoData();
     showToast('Données d’exemple chargées avec succès', 'success');
     onDataChanged();
   };
@@ -408,7 +409,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
           <button
             type="button"
             onClick={handleLoadDemo}
-            className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-card-subtle hover:bg-teal-50 dark:hover:bg-teal-950/40 text-teal-700 dark:text-teal-400 border border-soft hover:border-teal-300 text-xs font-semibold transition flex items-center justify-center gap-1.5"
+            className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-card-subtle hover:bg-teal-50 dark:hover:bg-teal-950/40 text-teal-700 dark:text-teal-400 border border-soft hover:border-teal-300 text-xs font-semibold transition flex items-center justify-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Charger un exemple de données</span>
@@ -417,7 +418,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
           <button
             type="button"
             onClick={() => setShowResetConfirm(true)}
-            className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-card-subtle hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-soft hover:border-rose-300 text-xs font-semibold transition flex items-center justify-center gap-1.5"
+            className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-card-subtle hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-soft hover:border-rose-300 text-xs font-semibold transition flex items-center justify-center gap-1.5"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Effacer toutes les données</span>

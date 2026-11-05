@@ -101,7 +101,7 @@ export const GlossaireModal: React.FC<GlossaireModalProps> = ({ isOpen, onClose 
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`min-h-[36px] px-3 py-1.5 rounded-xl font-semibold transition shrink-0 select-none ${
+                className={`min-h-[44px] px-3 py-1.5 rounded-xl font-semibold transition shrink-0 select-none ${
                   selectedCategory === cat.id
                     ? 'bg-[#1F5A43] text-white shadow-xs'
                     : 'bg-card-subtle text-sub hover:text-main border border-soft'
@@ -164,7 +164,7 @@ export const GlossaireModal: React.FC<GlossaireModalProps> = ({ isOpen, onClose 
           <span>{filteredItems.length} définitions disponibles</span>
           <button
             onClick={onClose}
-            className="min-h-[40px] px-4 py-1.5 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-bold transition text-xs"
+            className="min-h-[44px] px-4 py-1.5 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-bold transition text-xs"
           >
             Fermer
           </button>

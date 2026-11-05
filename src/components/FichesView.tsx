@@ -134,7 +134,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
         <button
           onClick={() => setActiveCategory('all')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 select-none ${
             activeCategory === 'all'
               ? 'bg-[#1F5A43] text-white shadow-xs'
               : 'bg-card text-sub hover:text-main border border-soft shadow-soft'
@@ -145,7 +145,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
 
         <button
           onClick={() => setActiveCategory('mains')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
             activeCategory === 'mains'
               ? 'bg-[#1F5A43] text-white shadow-xs'
               : 'bg-card text-sub hover:text-main border border-soft shadow-soft'
@@ -157,7 +157,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
 
         <button
           onClick={() => setActiveCategory('epi')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
             activeCategory === 'epi'
               ? 'bg-[#1F5A43] text-white shadow-xs'
               : 'bg-card text-sub hover:text-main border border-soft shadow-soft'
@@ -169,7 +169,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
 
         <button
           onClick={() => setActiveCategory('locaux')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
             activeCategory === 'locaux'
               ? 'bg-[#1F5A43] text-white shadow-xs'
               : 'bg-card text-sub hover:text-main border border-soft shadow-soft'
@@ -181,7 +181,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
 
         <button
           onClick={() => setActiveCategory('favoris')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
             activeCategory === 'favoris'
               ? 'bg-amber-400 text-slate-950 font-bold shadow-xs'
               : 'bg-card text-amber-600 dark:text-amber-400 hover:text-amber-700 border border-soft shadow-soft'
@@ -193,7 +193,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
 
         <button
           onClick={() => setActiveCategory('tableaux')}
-          className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
+          className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 select-none ${
             activeCategory === 'tableaux'
               ? 'bg-indigo-600 text-white shadow-xs'
               : 'bg-card text-indigo-700 dark:text-indigo-400 hover:text-indigo-800 border border-soft shadow-soft'
@@ -425,7 +425,7 @@ export const FichesView: React.FC<FichesViewProps> = ({
                       {/* Favorite button */}
                       <button
                         onClick={(e) => handleToggleFavorite(fiche.id, e)}
-                        className={`min-h-[36px] min-w-[36px] p-2 rounded-xl transition active:scale-90 ${
+                        className={`min-h-[44px] min-w-[36px] p-2 rounded-xl transition active:scale-90 ${
                           isFav
                             ? 'text-amber-500 hover:text-amber-600 bg-amber-50 dark:bg-amber-950/50'
                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-card-subtle'

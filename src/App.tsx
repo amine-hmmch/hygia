@@ -26,6 +26,7 @@ import { PlanAnnuelModule } from './components/PlanAnnuelModule';
 import { RegistresModule } from './components/RegistresModule';
 import { JournalModule } from './components/JournalModule';
 const CuisineModule = lazy(() => import('./components/CuisineModule').then((m) => ({ default: m.CuisineModule })));
+const RapportTrimestrielModule = lazy(() => import('./components/RapportTrimestrielModule').then((m) => ({ default: m.RapportTrimestrielModule })));
 const RapportMensuelModal = lazy(() => import('./components/RapportMensuelModal').then((m) => ({ default: m.RapportMensuelModal })));
 import { UrgenceAesModal } from './components/UrgenceAesModal';
 import { GlossaireModal } from './components/GlossaireModal';
@@ -47,6 +48,7 @@ type View =
   | 'dechets'
   | 'cuisine'
   | 'plan'
+  | 'rapport_trim'
   | 'registre'
   | 'journal'
   | 'tableau_bord'
@@ -229,6 +231,8 @@ export default function App() {
         return <DechetsModule onBackToHome={back} />;
       case 'cuisine':
         return <CuisineModule onBackToHome={back} initialTab={cuisineTab} />;
+      case 'rapport_trim':
+        return <RapportTrimestrielModule onBack={back} />;
       case 'plan':
         return (
           <PlanAnnuelModule
@@ -330,6 +334,7 @@ export default function App() {
             onPlan={() => go('plan')}
             onActions={() => go('actions')}
             onRapport={() => setIsRapportOpen(true)}
+            onRapportTrimestriel={() => go('rapport_trim')}
             onTableauBord={() => go('tableau_bord')}
           />
         );

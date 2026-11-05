@@ -146,7 +146,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 select-none ${
+            className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 select-none ${
               statusFilter === 'all'
                 ? 'bg-[#1F5A43] text-white shadow-xs'
                 : 'bg-card-subtle text-sub hover:text-main border border-soft'
@@ -163,7 +163,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 border select-none ${
+                className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-2 border select-none ${
                   statusFilter === st
                     ? `${cfg.bg} ${cfg.color} ${cfg.border} ring-2 ring-current`
                     : 'bg-card-subtle text-sub hover:text-main border-soft'
@@ -255,7 +255,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
                   {/* Status Toggle Button */}
                   <button
                     onClick={() => handleAdvanceStatus(action)}
-                    className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase transition border flex items-center gap-1.5 shadow-xs active:scale-95 shrink-0 ${cfg.bg} ${cfg.color} ${cfg.border}`}
+                    className={`min-h-[44px] px-3.5 py-1.5 rounded-xl font-bold text-xs uppercase transition border flex items-center gap-1.5 shadow-xs active:scale-95 shrink-0 ${cfg.bg} ${cfg.color} ${cfg.border}`}
                     title="Toucher pour passer au statut suivant"
                   >
                     <span>{cfg.label}</span>
@@ -293,7 +293,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
                     {action.auditId && onViewAudit && action.componentId !== 'cuisine' && action.componentId !== 'registres' && (
                       <button
                         onClick={() => onViewAudit(action.auditId!)}
-                        className="min-h-[36px] px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-[#1F5A43] dark:text-teal-300 hover:bg-teal-100 font-semibold text-xs border border-teal-200 dark:border-teal-800/60 transition dark:hover:bg-teal-900/50"
+                        className="min-h-[44px] px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/70 text-[#1F5A43] dark:text-teal-300 hover:bg-teal-100 font-semibold text-xs border border-teal-200 dark:border-teal-800/60 transition dark:hover:bg-teal-900/50"
                       >
                         Voir audit
                       </button>
@@ -301,7 +301,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
 
                     <button
                       onClick={() => setEditingAction(action)}
-                      className="min-h-[36px] p-2 rounded-lg bg-card-subtle text-sub hover:text-main border border-soft transition"
+                      className="min-h-[44px] p-2 rounded-lg bg-card-subtle text-sub hover:text-main border border-soft transition"
                       title="Modifier cette action"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -309,7 +309,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
 
                     <button
                       onClick={() => setActionToDelete(action)}
-                      className="min-h-[36px] p-2 rounded-lg bg-card-subtle text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border border-soft transition"
+                      className="min-h-[44px] p-2 rounded-lg bg-card-subtle text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 border border-soft transition"
                       title="Supprimer cette action"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

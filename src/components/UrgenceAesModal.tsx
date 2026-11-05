@@ -231,14 +231,14 @@ export const UrgenceAesModal: React.FC<UrgenceAesModalProps> = ({ isOpen, onClos
         <div className="p-4 bg-card-subtle border-t border-soft flex items-center justify-between text-xs text-sub shrink-0">
           <button
             onClick={handlePrint}
-            className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-semibold flex items-center gap-1.5"
+            className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-card border border-soft hover:bg-slate-200 dark:hover:bg-slate-800 text-main font-semibold flex items-center gap-1.5"
           >
             <Printer className="w-4 h-4" />
             <span>Imprimer la fiche</span>
           </button>
           <button
             onClick={onClose}
-            className="min-h-[40px] px-4 py-1.5 rounded-xl bg-[#1F5A43] hover:bg-[#174835] text-white font-bold transition text-xs"
+            className="min-h-[44px] px-4 py-1.5 rounded-xl bg-[#1F5A43] hover:bg-[#174835] text-white font-bold transition text-xs"
           >
             Compris / Fermer
           </button>

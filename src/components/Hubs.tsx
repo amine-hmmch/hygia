@@ -23,6 +23,7 @@ import {
   NotebookPen,
   Thermometer,
   SlidersHorizontal,
+  Send,
 } from 'lucide-react';
 import { SterilisationIcon } from './AppMaskedIcons';
 import { RegistreId } from '../data/thmData';
@@ -127,9 +128,10 @@ export const SuiviHub: React.FC<{
   onPlan: () => void;
   onActions: () => void;
   onRapport: () => void;
+  onRapportTrimestriel: () => void;
   onTableauBord: () => void;
   nbActions: number;
-}> = ({ onPlan, onActions, onRapport, onTableauBord, nbActions }) => (
+}> = ({ onPlan, onActions, onRapport, onRapportTrimestriel, onTableauBord, nbActions }) => (
   <div className="space-y-6 pb-6">
     <HubHeader title="Suivi" subtitle="Ce qui est prévu, ce qui est fait, ce qui reste" />
     <section>
@@ -140,6 +142,7 @@ export const SuiviHub: React.FC<{
     <section>
       <HubTitle>Bilans</HubTitle>
       <HubRow tone="sea" icon={<FileText className={ic} />} title="Rapport mensuel ou trimestriel" desc="À imprimer ou enregistrer en PDF" onClick={onRapport} />
+      <HubRow tone="pine" icon={<Send className={ic} />} title="Rapport trimestriel à envoyer" desc="Tes chiffres du trimestre, en fichier pour le district" onClick={onRapportTrimestriel} />
       <HubRow tone="plum" icon={<BarChart3 className={ic} />} title="Tableau de bord" desc="Scores par service et par composante" onClick={onTableauBord} />
     </section>
   </div>

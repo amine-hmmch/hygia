@@ -188,7 +188,7 @@ export const TableauDeBordModule: React.FC<TableauDeBordModuleProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowRapportModal(true)}
-              className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-[#1F5A43] hover:bg-[#174835] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95"
+              className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-[#1F5A43] hover:bg-[#174835] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95"
             >
               <Printer className="w-4 h-4" />
               <span>Rapport PDF</span>

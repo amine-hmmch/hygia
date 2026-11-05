@@ -161,29 +161,29 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
           type="month"
           value={month}
           onChange={(e) => e.target.value && setMonth(e.target.value)}
-          className="h-10 px-2.5 rounded-lg border border-medium bg-card text-main text-[15px] min-w-[128px] flex-1 max-w-[180px]"
+          className="h-11 px-2.5 rounded-lg border border-medium bg-card text-main text-[15px] min-w-[128px] flex-1 max-w-[180px]"
           aria-label="Mois du rapport"
         />
         <select
           value={periode}
           onChange={(e) => setPeriode(e.target.value as 'mois' | 'trimestre')}
-          className="h-10 px-1.5 rounded-lg border border-medium bg-card text-main text-[15px] shrink-0"
+          className="h-11 px-1.5 rounded-lg border border-medium bg-card text-main text-[15px] shrink-0"
           aria-label="Période"
         >
           <option value="mois">Mois</option>
           <option value="trimestre">Trimestre</option>
         </select>
         <span className="flex-1" />
-        <button onClick={partager} aria-label="Partager le résumé" className="h-10 w-10 rounded-lg border border-medium text-main flex items-center justify-center">
+        <button onClick={partager} aria-label="Partager le résumé" className="h-11 w-10 rounded-lg border border-medium text-main flex items-center justify-center">
           <Share2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => window.print()}
-          className="h-10 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5"
+          className="h-11 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5"
         >
           <Printer className="w-4 h-4" /> <span className="whitespace-nowrap hidden min-[430px]:inline">Imprimer</span>
         </button>
-        <button onClick={onClose} aria-label="Fermer" className="w-10 h-10 flex items-center justify-center text-sub">
+        <button onClick={onClose} aria-label="Fermer" className="w-11 h-11 flex items-center justify-center text-sub">
           <X className="w-5 h-5" />
         </button>
       </div>

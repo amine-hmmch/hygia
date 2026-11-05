@@ -169,10 +169,10 @@ export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: bo
       <div className="report-overlay fixed inset-0 z-[70] overflow-y-auto bg-surface">
         <div className="no-print sticky top-0 bg-surface border-b border-soft px-4 py-2.5 flex items-center gap-2">
           <span className="flex-1 text-[14px] text-sub">Aperçu du carnet de bord</span>
-          <button onClick={() => window.print()} className="h-10 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5">
+          <button onClick={() => window.print()} className="h-11 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5">
             <Printer className="w-4 h-4" /> <span className="whitespace-nowrap">Imprimer</span>
           </button>
-          <button onClick={() => setImprimer(false)} aria-label="Fermer" className="w-10 h-10 flex items-center justify-center text-sub"><X className="w-5 h-5" /></button>
+          <button onClick={() => setImprimer(false)} aria-label="Fermer" className="w-11 h-11 flex items-center justify-center text-sub"><X className="w-5 h-5" /></button>
         </div>
         <div className="report-sheet max-w-3xl mx-auto px-4 py-6 space-y-5">
           <header>
@@ -211,28 +211,28 @@ export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: bo
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={onBackToHome} className="w-10 h-10 -ms-2 flex items-center justify-center text-sub" aria-label="Retour">
+        <button onClick={onBackToHome} className="w-11 h-11 -ms-2 flex items-center justify-center text-sub" aria-label="Retour">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-semibold text-main leading-tight">Carnet de bord</h2>
           <p className="text-[13px] text-sub leading-tight">Ce que tu as fait chaque jour</p>
         </div>
-        <button onClick={() => ouvrirGestion()} className="min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5" aria-label="Gérer mes tâches">
+        <button onClick={() => ouvrirGestion()} className="min-h-[44px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5" aria-label="Gérer mes tâches">
           <SlidersHorizontal className="w-4 h-4" /> Mes tâches
         </button>
       </div>
 
       {/* Navigation par jour */}
       <div className="flex items-center justify-between border-y border-soft py-2.5">
-        <button onClick={() => decaler(-1)} className="w-10 h-10 flex items-center justify-center text-sub" aria-label="Jour précédent"><ChevronLeft className="w-5 h-5" /></button>
+        <button onClick={() => decaler(-1)} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Jour précédent"><ChevronLeft className="w-5 h-5" /></button>
         <div className="text-center">
           <p className="font-serif-display text-[20px] leading-tight text-main capitalize">{fmtLong(date)}</p>
           {!estAujourdhui && (
             <button onClick={() => setDate(aujourdhui())} className="text-[12px] text-primary font-medium">Revenir à aujourd’hui</button>
           )}
         </div>
-        <button onClick={() => decaler(1)} className="w-10 h-10 flex items-center justify-center text-sub" aria-label="Jour suivant"><ChevronRight className="w-5 h-5" /></button>
+        <button onClick={() => decaler(1)} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Jour suivant"><ChevronRight className="w-5 h-5" /></button>
       </div>
 
       {/* Tâches */}
@@ -263,7 +263,7 @@ export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: bo
             </button>
           ))
         )}
-        <button onClick={() => ouvrirGestion(true)} className="mt-3 min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
+        <button onClick={() => ouvrirGestion(true)} className="mt-3 min-h-[44px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Ajouter une tâche
         </button>
       </section>
@@ -300,11 +300,11 @@ export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: bo
       <section>
         <div className="flex items-center justify-between pb-2 border-b border-medium">
           <div className="flex items-center gap-1">
-            <button onClick={() => changeMois(-1)} className="w-8 h-8 flex items-center justify-center text-sub" aria-label="Mois précédent"><ChevronLeft className="w-4 h-4" /></button>
+            <button onClick={() => changeMois(-1)} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Mois précédent"><ChevronLeft className="w-4 h-4" /></button>
             <h3 className="label-caps w-32 text-center capitalize">{NOMS_MOIS_LONGS[m - 1]} {y}</h3>
-            <button onClick={() => changeMois(1)} className="w-8 h-8 flex items-center justify-center text-sub" aria-label="Mois suivant"><ChevronRight className="w-4 h-4" /></button>
+            <button onClick={() => changeMois(1)} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Mois suivant"><ChevronRight className="w-4 h-4" /></button>
           </div>
-          <button onClick={() => setImprimer(true)} className="text-xs text-sub flex items-center gap-1"><Printer className="w-3.5 h-3.5" /> Imprimer</button>
+          <button onClick={() => setImprimer(true)} className="text-xs text-sub flex items-center gap-1 min-h-[44px]"><Printer className="w-3.5 h-3.5" /> Imprimer</button>
         </div>
         <div className="grid grid-cols-7 gap-1 pt-3 text-center">
           {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((x, i) => (<span key={i} className="label-caps">{x}</span>))}
@@ -318,7 +318,7 @@ export const JournalModule: React.FC<{ onBackToHome: () => void; openEditor?: bo
                 key={d}
                 onClick={() => setDate(d)}
                 aria-label={`Jour ${i + 1}`}
-                className={`h-10 rounded-lg text-[14px] flex flex-col items-center justify-center ${sel ? 'border border-primary text-primary font-medium' : 'text-main'}`}
+                className={`h-11 rounded-lg text-[14px] flex flex-col items-center justify-center ${sel ? 'border border-primary text-primary font-medium' : 'text-main'}`}
               >
                 {i + 1}
                 <span className={`mt-0.5 w-1.5 h-1.5 rounded-full ${e === 'plein' ? 'bg-[var(--color-success)]' : e === 'partiel' ? 'bg-[var(--color-warning)]' : 'bg-transparent'}`} />

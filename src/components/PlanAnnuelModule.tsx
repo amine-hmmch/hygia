@@ -264,7 +264,7 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
               <span className="label-caps block mb-1.5">Fréquence rapide</span>
               <div className="flex flex-wrap gap-1.5">
                 {PRESETS.map((pr) => (
-                  <button key={pr.label} type="button" onClick={() => setDraft({ ...draft, prevu: [...pr.prevu] })} className="min-h-[36px] px-3 rounded-full border border-medium text-[13px] text-main active:bg-card-subtle">
+                  <button key={pr.label} type="button" onClick={() => setDraft({ ...draft, prevu: [...pr.prevu] })} className="min-h-[44px] px-3 rounded-full border border-medium text-[13px] text-main active:bg-card-subtle">
                     {pr.label}
                   </button>
                 ))}
@@ -373,10 +373,10 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
         <style>{`@media print { @page { size: A4 landscape; margin: 10mm; } }`}</style>
         <div className="no-print sticky top-0 bg-surface border-b border-soft px-4 py-2.5 flex items-center gap-2">
           <span className="flex-1 text-[14px] text-sub">Aperçu : Plan d’action {annee}</span>
-          <button onClick={() => window.print()} className="h-10 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5">
+          <button onClick={() => window.print()} className="h-11 px-3.5 rounded-lg bg-primary text-white dark:text-[#10201a] text-sm font-medium flex items-center gap-1.5">
             <Printer className="w-4 h-4" /> <span className="whitespace-nowrap">Imprimer</span>
           </button>
-          <button onClick={() => setPrinting(false)} aria-label="Fermer" className="w-10 h-10 flex items-center justify-center text-sub"><X className="w-5 h-5" /></button>
+          <button onClick={() => setPrinting(false)} aria-label="Fermer" className="w-11 h-11 flex items-center justify-center text-sub"><X className="w-5 h-5" /></button>
         </div>
         <div className="report-sheet px-4 py-6 space-y-6" style={{ maxWidth: '100%' }}>
           <header>
@@ -430,7 +430,7 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={onBackToHome} className="w-10 h-10 -ms-2 flex items-center justify-center text-sub" aria-label="Retour à l'accueil">
+        <button onClick={onBackToHome} className="w-11 h-11 -ms-2 flex items-center justify-center text-sub" aria-label="Retour à l'accueil">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1 min-w-0">
@@ -563,10 +563,10 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
                     </div>
                   ) : (
                     <div className="mt-1 flex items-center gap-1 text-[12px] text-sub flex-wrap">
-                      <button onClick={() => setRenAxe({ ancien: axe, valeur: axe })} className="min-h-[36px] px-2.5 rounded-md border border-soft flex items-center gap-1.5"><Pencil className="w-3.5 h-3.5" /> Renommer l’axe</button>
+                      <button onClick={() => setRenAxe({ ancien: axe, valeur: axe })} className="min-h-[44px] px-2.5 rounded-md border border-soft flex items-center gap-1.5"><Pencil className="w-3.5 h-3.5" /> Renommer l’axe</button>
                       <button onClick={() => deplacerAxe(axe, -1)} aria-label="Monter l’axe" className="w-9 h-9 rounded-md border border-soft flex items-center justify-center"><ChevronUp className="w-4 h-4" /></button>
                       <button onClick={() => deplacerAxe(axe, 1)} aria-label="Descendre l’axe" className="w-9 h-9 rounded-md border border-soft flex items-center justify-center"><ChevronDown className="w-4 h-4" /></button>
-                      <button onClick={() => setSupprAxe(axe)} className="min-h-[36px] px-2.5 rounded-md border border-soft text-danger flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5" /> Supprimer l’axe</button>
+                      <button onClick={() => setSupprAxe(axe)} className="min-h-[44px] px-2.5 rounded-md border border-soft text-danger flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5" /> Supprimer l’axe</button>
                     </div>
                   )}
                 </div>

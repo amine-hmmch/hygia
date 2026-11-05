@@ -170,7 +170,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 no-print">
-        <button onClick={onBack} className="w-10 h-10 -ms-2 flex items-center justify-center text-sub" aria-label="Retour">
+        <button onClick={onBack} className="w-11 h-11 -ms-2 flex items-center justify-center text-sub" aria-label="Retour">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <span className={`tile tile-${TONES[def.id]}`}>
@@ -243,7 +243,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
             </label>
           ))}
           {!details && def.champs.some((c) => visible(c) && estOptionnel(c)) && (
-            <button type="button" onClick={() => setDetails(true)} className="text-[14px] text-primary font-medium flex items-center gap-1.5 py-1">
+            <button type="button" onClick={() => setDetails(true)} className="text-[14px] text-primary font-medium flex items-center gap-1.5 min-h-[44px]">
               <Plus className="w-4 h-4" /> Ajouter des détails
             </button>
           )}
