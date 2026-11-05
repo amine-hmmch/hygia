@@ -23,7 +23,7 @@ const REPERES = [
   { titre: 'Eau de Javel : 0,5 % pour le sang', texte: 'Pour un déversement de sang, utiliser une solution à 0,5 % (5 000 ppm). Préparer chaque jour, ne pas mélanger avec un autre produit.' },
   { titre: 'Du plus propre vers le plus sale', texte: 'Le bionettoyage va du haut vers le bas et du plus propre vers le plus sale, avec le matériel du secteur.' },
   { titre: 'Froid à 4 °C ou moins, chaud à 63 °C ou plus', texte: 'Zone de danger entre 10 et 63 °C : y passer le moins de temps possible.' },
-  { titre: 'Collecteurs d’objets piquants : aux deux tiers', texte: 'Les remplacer quand ils sont aux deux tiers pleins et ne jamais recapuchonner une aiguille.' },
+  { titre: 'Collecteurs d’objets piquants : aux trois quarts', texte: 'Ne pas dépasser les trois quarts de leur capacité, les fermer et les évacuer. Ne jamais recapuchonner une aiguille.' },
   { titre: 'Friction hydro-alcoolique : 20 à 30 secondes', texte: 'Jusqu’au séchage complet. Si les mains sont souillées : eau et savon pendant 40 à 60 secondes.' },
   { titre: 'Plats témoins : 5 jours à 0-3 °C', texte: 'Environ 100 g de chaque plat servi, étiquetés, pour enquêter en cas de toxi-infection.' },
 ];

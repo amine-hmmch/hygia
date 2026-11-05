@@ -17,6 +17,8 @@ export interface ChampDef {
   placeholder?: string;
   requis?: boolean;
   step?: string;
+  /** Champ affiché seulement si un autre champ a l'une de ces valeurs. */
+  si?: { champ: string; valeurs: string[] };
 }
 
 export interface RegistreDef {
@@ -29,7 +31,24 @@ export interface RegistreDef {
   sousTitre: (e: Record<string, any>) => string;
   /** true = conforme, false = non conforme, undefined = sans objet */
   conforme?: (e: Record<string, any>) => boolean | undefined;
+  /** Résultat calculé automatiquement (remplace le choix manuel quand il est connu). */
+  resultatAuto?: (e: Record<string, any>) => 'Conforme' | 'Non conforme' | undefined;
   repere?: string;
+}
+
+/** Seuils de colonies par boîte pour les prélèvements de surface (manuel d'hygiène hospitalière, 2010). */
+export const ZONES_SURFACE = [
+  { label: 'Bloc opératoire, salle d’examen invasif (moins de 5)', seuil: 5 },
+  { label: 'Stérilisation, conditionnement (moins de 5)', seuil: 5 },
+  { label: 'Pharmacie, hotte (moins de 1)', seuil: 1 },
+];
+
+function resultatSurface(e: Record<string, any>): 'Conforme' | 'Non conforme' | undefined {
+  if (e.nature !== 'Surface') return undefined;
+  const z = ZONES_SURFACE.find((x) => x.label === e.zoneSeuil);
+  const n = parseFloat(String(e.colonies ?? '').replace(',', '.'));
+  if (!z || Number.isNaN(n)) return undefined;
+  return n < z.seuil ? 'Conforme' : 'Non conforme';
 }
 
 const POINTS_EAU = ['Cuisine', 'Hémodialyse', 'Laboratoire', 'Unités de soins', 'Réservoir', 'Branchement principal'];
@@ -74,16 +93,25 @@ export const REGISTRES: RegistreDef[] = [
     id: 'prelevements',
     titre: 'Prélèvements',
     description: 'Eau, aliments, surfaces, air : suivi des résultats',
+    repere:
+      'Surfaces (manuel d’hygiène hospitalière, Ministère de la Santé 2010) : moins de 5 colonies par boîte au bloc opératoire, en salle d’examen invasif et en stérilisation (conditionnement) ; moins de 1 colonie en pharmacie (hotte). Fréquence conseillée au bloc : surfaces 1 fois par trimestre, air 3 à 4 fois par an et après chaque changement de filtres. Eau d’hémodialyse : moins de 100 CFU par litre, 1 prélèvement par mois.',
     champs: [
       { id: 'nature', label: 'Nature', type: 'select', options: ['Eau de boisson', 'Eau d’hémodialyse', 'Aliment', 'Surface', 'Air', 'Matériel ou dispositif'], requis: true },
       { id: 'lieu', label: 'Lieu ou échantillon', type: 'text', placeholder: 'ex. Cuisine, bloc opératoire', requis: true },
+      { id: 'zoneSeuil', label: 'Zone (seuil du manuel)', type: 'select', options: ZONES_SURFACE.map((z) => z.label), si: { champ: 'nature', valeurs: ['Surface'] } },
+      { id: 'colonies', label: 'Colonies par boîte', type: 'number', step: '1', si: { champ: 'nature', valeurs: ['Surface'] } },
       { id: 'laboratoire', label: 'Laboratoire', type: 'text' },
       { id: 'resultat', label: 'Résultat', type: 'select', options: ['En attente', 'Conforme', 'Non conforme'], requis: true },
       { id: 'observation', label: 'Observation', type: 'textarea' },
     ],
     titreLigne: (e) => `${e.nature || 'Prélèvement'} · ${e.lieu || ''}`,
-    sousTitre: (e) => [e.resultat, e.laboratoire, e.observation].filter(Boolean).join(' · '),
-    conforme: (e) => (e.resultat === 'Conforme' ? true : e.resultat === 'Non conforme' ? false : undefined),
+    sousTitre: (e) =>
+      [resultatSurface(e) || e.resultat, e.colonies !== undefined && e.colonies !== '' ? `${e.colonies} col./boîte` : '', e.laboratoire, e.observation].filter(Boolean).join(' · '),
+    resultatAuto: resultatSurface,
+    conforme: (e) => {
+      const r = resultatSurface(e) || e.resultat;
+      return r === 'Conforme' ? true : r === 'Non conforme' ? false : undefined;
+    },
   },
   {
     id: 'sensibilisation',

@@ -39,6 +39,14 @@ function creerActionAuto(def: RegistreDef, e: RegistreEntree) {
       jours: 3,
     },
   };
+  if (def.id === 'prelevements' && e.nature === 'Surface') {
+    mesures.prelevements = {
+      mesure:
+        'Revoir le protocole de nettoyage et de désinfection de la zone et sa mise en œuvre, refaire un prélèvement de contrôle, et informer l’équipe d’hygiène et la direction. Si S. aureus, entérobactéries, Aspergillus ou Pseudomonas sont retrouvés, reprendre tout le protocole et prévoir de nouveaux contrôles.',
+      source: 'Manuel d’hygiène hospitalière, Ministère de la Santé (2010) : seuil de colonies par boîte',
+      jours: 3,
+    };
+  }
   const m = mesures[def.id] || {
     mesure: 'Rechercher la cause de la non-conformité, corriger et vérifier à nouveau.',
     source: def.titre,
@@ -97,15 +105,26 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
     setOpen(true);
   };
 
-  const ok = def.champs.every((c) => !c.requis || (vals[c.id] ?? '').toString().trim() !== '');
+  const visible = (c: { si?: { champ: string; valeurs: string[] } }) => !c.si || c.si.valeurs.includes(vals[c.si.champ] ?? '');
+  const brut = (): Record<string, any> => {
+    const o: Record<string, any> = {};
+    def.champs.forEach((c) => (o[c.id] = c.type === 'number' ? (vals[c.id] ?? '').replace(',', '.') : vals[c.id]));
+    return o;
+  };
+  const auto = def.resultatAuto?.(brut());
+  const ok = def.champs.every(
+    (c) => !c.requis || !visible(c) || (c.id === 'resultat' && auto) || (vals[c.id] ?? '').toString().trim() !== ''
+  );
 
   const save = () => {
     if (!ok) return;
     const data: Record<string, any> = { date, heure };
     def.champs.forEach((c) => {
+      if (!visible(c)) return;
       const v = (vals[c.id] ?? '').toString().trim();
       if (v !== '') data[c.id] = c.type === 'number' ? v.replace(',', '.') : v;
     });
+    if (auto) data.resultat = auto;
     const saved = thmService.addEntree(def.id, data as any);
     setEntrees(thmService.getRegistre(def.id));
     setOpen(false);
@@ -168,7 +187,7 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
         </button>
       ) : (
         <div className="border border-medium rounded-lg p-4 space-y-3 bg-card no-print">
-          {def.champs.map((c) => (
+          {def.champs.filter(visible).map((c) => (
             <label key={c.id} className="block">
               <span className="label-caps block mb-1">
                 {c.label}
@@ -177,7 +196,8 @@ const Registre: React.FC<{ def: RegistreDef; onBack: () => void; autoOpen?: bool
               {c.type === 'select' ? (
                 <select
                   className={inputCls}
-                  value={vals[c.id] ?? ''}
+                  value={c.id === 'resultat' && auto ? auto : vals[c.id] ?? ''}
+                  disabled={c.id === 'resultat' && !!auto}
                   onChange={(e) => setVals({ ...vals, [c.id]: e.target.value })}
                 >
                   <option value="">Choisir</option>

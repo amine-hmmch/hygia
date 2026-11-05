@@ -157,6 +157,10 @@ export const AProposModal: React.FC<AProposModalProps> = ({ isOpen, onClose }) =
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <p><strong className="text-main">Manuel d'hygiène hospitalière (Ministère de la Santé, 2010) :</strong> Seuils de colonies par boîte pour les prélèvements de surface, fréquence des contrôles au bloc opératoire, lutte anti-vectorielle.</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <p><strong className="text-main">Déchets DMP (Chapitre VI) :</strong> Tri selon la loi 28-00, pesées en kg, sacs couleur et graphique mensuel.</p>
               </div>
             </div>
