@@ -198,10 +198,11 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
             {/* Nom de l'établissement */}
             <div>
               <label className="text-xs font-semibold text-main block mb-1">
-                Nom de l'établissement <span className="text-sub font-normal">(champ libre)</span> :
+                Nom de l'établissement <span className="text-danger" aria-hidden="true">*</span> :
               </label>
               <input
                 type="text"
+                required
                 value={settings.etablissement || ''}
                 onChange={(e) => setSettings({ ...settings, etablissement: e.target.value })}
                 placeholder="Ex : Centre de Santé Urbain, Hôpital de jour..."
@@ -226,10 +227,11 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
             {/* Nom de l'utilisateur */}
             <div>
               <label className="text-xs font-semibold text-main block mb-1">
-                Nom de l'utilisateur <span className="text-sub font-normal">(facultatif)</span> :
+                Nom de l'utilisateur <span className="text-danger" aria-hidden="true">*</span> :
               </label>
               <input
                 type="text"
+                required
                 value={settings.userName || ''}
                 onChange={(e) => setSettings({ ...settings, userName: e.target.value })}
                 placeholder="Ex : Dr. Bennani, A. Alami..."
@@ -240,10 +242,11 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
             {/* Fonction / Rôle */}
             <div>
               <label className="text-xs font-semibold text-main block mb-1">
-                Fonction de l'utilisateur <span className="text-sub font-normal">(facultatif)</span> :
+                Fonction ou spécialité <span className="text-danger" aria-hidden="true">*</span> :
               </label>
               <input
                 type="text"
+                required
                 value={settings.userRole || ''}
                 onChange={(e) =>
                   setSettings({

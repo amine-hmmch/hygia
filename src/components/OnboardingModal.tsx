@@ -8,14 +8,18 @@ interface OnboardingModalProps {
 }
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComplete }) => {
-  const [etablissementName, setEtablissementName] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const initial = storageService.getSettings();
+  const dejaInscrit = storageService.hasCompletedOnboarding();
+  const [etablissementName, setEtablissementName] = useState(initial.etablissement || '');
+  const [userName, setUserName] = useState(initial.userName || '');
+  const [userRole, setUserRole] = useState(initial.userRole || '');
+  const complet = !!etablissementName.trim() && !!userName.trim() && !!userRole.trim();
 
   if (!isOpen) return null;
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!complet) return;
     const current = storageService.getSettings();
     storageService.saveSettings({
       ...current,
@@ -28,10 +32,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
     onComplete();
   };
 
-  const handleSkip = () => {
-    storageService.setOnboardingCompleted();
-    onComplete();
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in overflow-y-auto">
@@ -41,20 +41,22 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
         </div>
 
         <h2 className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Bienvenue
+          {dejaInscrit ? 'Complète ton profil' : 'Bienvenue'}
         </h2>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
-          Indiquez le nom de votre établissement de soins pour personnaliser l'application et vos rapports d'audit.
+          Ces trois informations sont obligatoires : elles apparaissent sur tes rapports et tes audits.
         </p>
 
         <form onSubmit={handleSave} className="mt-5 space-y-3.5">
           <div>
             <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">
-              Nom de votre établissement :
+              Nom de votre établissement <span className="text-danger" aria-hidden="true">*</span> :
             </label>
             <input
               type="text"
               autoFocus
+              required
+              aria-label="Établissement"
               value={etablissementName}
               onChange={(e) => setEtablissementName(e.target.value)}
               placeholder="Ex : Centre de Santé Urbain, Clinique..."
@@ -65,10 +67,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
               <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Votre nom <span className="font-normal text-slate-400">(facultatif)</span> :
+                Votre nom <span className="text-danger" aria-hidden="true">*</span> :
               </label>
               <input
                 type="text"
+                required
+                aria-label="Votre nom"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Ex : Dr. Bennani"
@@ -77,13 +81,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
             </div>
             <div>
               <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Votre nom ou fonction <span className="font-normal text-slate-400">(facultatif)</span> :
+                Fonction ou spécialité <span className="text-danger" aria-hidden="true">*</span> :
               </label>
               <input
                 type="text"
+                required
+                aria-label="Fonction ou spécialité"
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
-                placeholder="Ex : Technicien d'hygiène"
+                placeholder="Ex : Technicien d'hygiène du milieu"
                 className="w-full min-h-[40px] px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#232724] border border-slate-200 dark:border-[#2D322E] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-xs focus:outline-none focus:border-[#1F5A43]"
               />
             </div>
@@ -91,15 +97,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onComp
 
           <div className="pt-3 flex flex-col-reverse sm:flex-row items-center gap-2 sm:justify-end">
             <button
-              type="button"
-              onClick={handleSkip}
-              className="w-full sm:w-auto min-h-[44px] px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#232724] text-xs font-semibold transition text-center"
-            >
-              Passer
-            </button>
-            <button
               type="submit"
-              className="w-full sm:w-auto min-h-[44px] px-5 py-2 rounded-xl bg-[#1F5A43] hover:bg-[#174835] active:scale-95 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm"
+              disabled={!complet}
+              className="disabled:opacity-40 w-full sm:w-auto min-h-[44px] px-5 py-2 rounded-xl bg-[#1F5A43] hover:bg-[#174835] active:scale-95 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-sm"
             >
               <span>Continuer</span>
               <ArrowRight className="w-4 h-4" />

@@ -90,6 +90,12 @@ export const storageService = {
     }
   },
 
+  /** Nom, fonction ou spécialité et établissement sont obligatoires. */
+  profilComplet(): boolean {
+    const s = this.getSettings();
+    return !!(s.userName || '').trim() && !!(s.userRole || '').trim() && !!(s.etablissement || '').trim();
+  },
+
   // Onboarding first launch
   hasCompletedOnboarding(): boolean {
     try {

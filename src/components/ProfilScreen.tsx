@@ -52,7 +52,12 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
   }, [tout, type, periode, seulNc, q]);
 
   const maj = (p: Partial<typeof s>) => setS({ ...s, ...p });
+  const manque = (v?: string) => !(v || '').trim();
   const enregistrer = () => {
+    if (manque(s.userName) || manque(s.userRole) || manque(s.etablissement)) {
+      showToast('Nom, fonction ou spécialité et établissement sont obligatoires', 'error');
+      return;
+    }
     storageService.saveSettings({ ...s, auditeurDefaut: s.auditeurDefaut || s.userName || '' });
     showToast('Profil enregistré', 'success');
   };
@@ -99,16 +104,16 @@ export const ProfilScreen: React.FC<Props> = ({ onOpenAudit, onOpenRegistre, onO
       <section className="space-y-3">
         <h3 className="label-caps pb-2 border-b border-medium">Identité</h3>
         <div>
-          <label className="text-xs font-semibold text-main block mb-1">Nom</label>
-          <input aria-label="Nom" className={field} value={s.userName || ''} onChange={(e) => maj({ userName: e.target.value })} autoComplete="off" />
+          <label className="text-xs font-semibold text-main block mb-1">Nom <span className="text-danger" aria-hidden="true">*</span></label>
+          <input aria-label="Nom" required aria-invalid={manque(s.userName)} className={field} value={s.userName || ''} onChange={(e) => maj({ userName: e.target.value })} autoComplete="off" />
         </div>
         <div>
-          <label className="text-xs font-semibold text-main block mb-1">Fonction</label>
-          <input aria-label="Fonction" className={field} value={s.userRole || ''} onChange={(e) => maj({ userRole: e.target.value })} placeholder="ex. Technicien d’hygiène du milieu" />
+          <label className="text-xs font-semibold text-main block mb-1">Fonction ou spécialité <span className="text-danger" aria-hidden="true">*</span></label>
+          <input aria-label="Fonction" required aria-invalid={manque(s.userRole)} className={field} value={s.userRole || ''} onChange={(e) => maj({ userRole: e.target.value })} placeholder="ex. Technicien d’hygiène du milieu" />
         </div>
         <div>
-          <label className="text-xs font-semibold text-main block mb-1">Établissement</label>
-          <input aria-label="Établissement" className={field} value={s.etablissement || ''} onChange={(e) => maj({ etablissement: e.target.value })} />
+          <label className="text-xs font-semibold text-main block mb-1">Établissement <span className="text-danger" aria-hidden="true">*</span></label>
+          <input aria-label="Établissement" required aria-invalid={manque(s.etablissement)} className={field} value={s.etablissement || ''} onChange={(e) => maj({ etablissement: e.target.value })} />
         </div>
         <button onClick={enregistrer} className="h-11 px-5 rounded-lg bg-primary text-white dark:text-[#10201a] font-medium">
           Enregistrer

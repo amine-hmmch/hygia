@@ -70,7 +70,8 @@ export default function App() {
   const [isGlossaireOpen, setIsGlossaireOpen] = useState(false);
   const [isAProposOpen, setIsAProposOpen] = useState(false);
   const [isRapportOpen, setIsRapportOpen] = useState(false);
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => !storageService.hasCompletedOnboarding());
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => !storageService.hasCompletedOnboarding() || !storageService.profilComplet());
+  const [premiereFois] = useState(() => !storageService.hasCompletedOnboarding());
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   const closeTutorial = () => {
@@ -374,7 +375,8 @@ export default function App() {
         onComplete={() => {
           setIsOnboardingOpen(false);
           refreshData();
-          setIsConfigOpen(true);
+          if (premiereFois && !storageService.getSettings().configure) setIsConfigOpen(true);
+          else openTutorialIfFirstTime();
         }}
       />
       <ConfigurationWizard
