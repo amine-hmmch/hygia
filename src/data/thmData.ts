@@ -186,8 +186,10 @@ export interface PlanAnnuel {
   suiviDepuis?: number;
   /** true dès que l'utilisateur a choisi ou modifié son plan (sinon : plan type proposé tel quel). */
   choisi?: boolean;
-  /** axes ajoutés par l'utilisateur */
+  /** axes ajoutés par l'utilisateur (ancien champ) */
   axesPerso?: string[];
+  /** liste complète et ordonnée des axes, quand l'utilisateur l'a personnalisée */
+  axes?: string[];
   updatedAt: string;
 }
 

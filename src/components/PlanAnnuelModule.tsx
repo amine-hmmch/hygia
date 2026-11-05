@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Plus, Minus, Printer, X, Trash2, RotateCcw } from 'lucide-react';
-import { AXES, Activite, PlanAnnuel, NOMS_MOIS, NOMS_MOIS_LONGS, SOURCE_LABEL } from '../data/thmData';
+import { ArrowLeft, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Plus, Minus, Printer, X, Trash2, RotateCcw, Copy, Pencil } from 'lucide-react';
+import { AXES, Activite, PlanAnnuel, NOMS_MOIS, NOMS_MOIS_LONGS, SOURCE_LABEL, SourceAuto } from '../data/thmData';
 import { thmService } from '../services/thmService';
 import { storageService } from '../services/storageService';
 import { ConfirmModal } from './ConfirmModal';
@@ -28,6 +28,8 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const [printing, setPrinting] = useState(false);
   const [choixPlan, setChoixPlan] = useState<'vide' | 'copie' | null>(null);
   const [nouvelAxe, setNouvelAxe] = useState<string | null>(null);
+  const [renAxe, setRenAxe] = useState<{ ancien: string; valeur: string } | null>(null);
+  const [supprAxe, setSupprAxe] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   useEffect(() => setPlan(thmService.getPlan(annee)), [annee]);
@@ -148,13 +150,57 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const setNum = (arr: number[], m: number, v: number) => arr.map((x, i) => (i === m ? Math.max(0, v) : x));
   const nomAxeCourt = (axe: string) => axe.split(' ').slice(0, 3).join(' ');
 
-  const axes = [...AXES, ...(plan.axesPerso || []), ...plan.activites.map((a) => a.axe)].filter((x, i, arr) => arr.indexOf(x) === i);
+  const axes = (plan.axes ?? [...AXES, ...(plan.axesPerso || [])])
+    .concat(plan.activites.map((a) => a.axe))
+    .filter((x, i, arr) => arr.indexOf(x) === i);
   const ajouterAxe = () => {
     const nom = (nouvelAxe || '').trim();
     if (!nom || axes.some((x) => x.toLowerCase() === nom.toLowerCase())) { setNouvelAxe(null); return; }
-    persist({ ...plan, axesPerso: [...(plan.axesPerso || []), nom] });
+    persist({ ...plan, axes: [...axes, nom] });
     setOpenAxe(nom);
     setNouvelAxe(null);
+  };
+  const deplacerAxe = (axe: string, sens: -1 | 1) => {
+    const i = axes.indexOf(axe);
+    const j = i + sens;
+    if (i < 0 || j < 0 || j >= axes.length) return;
+    const l = [...axes];
+    [l[i], l[j]] = [l[j], l[i]];
+    persist({ ...plan, axes: l });
+  };
+  const renommerAxe = () => {
+    if (!renAxe) return;
+    const nom = renAxe.valeur.trim();
+    const { ancien } = renAxe;
+    setRenAxe(null);
+    if (!nom || nom === ancien || axes.some((x) => x !== ancien && x.toLowerCase() === nom.toLowerCase())) return;
+    persist({
+      ...plan,
+      axes: axes.map((x) => (x === ancien ? nom : x)),
+      activites: plan.activites.map((a) => (a.axe === ancien ? { ...a, axe: nom } : a)),
+    });
+    setOpenAxe(nom);
+  };
+  const supprimerAxe = () => {
+    if (!supprAxe) return;
+    persist({ ...plan, axes: axes.filter((x) => x !== supprAxe), activites: plan.activites.filter((a) => a.axe !== supprAxe) });
+    setSupprAxe(null);
+    setOpenAxe(null);
+  };
+  const PRESETS: { label: string; prevu: number[] }[] = [
+    { label: 'Chaque semaine', prevu: Array(12).fill(4) },
+    { label: '2 fois par mois', prevu: Array(12).fill(2) },
+    { label: 'Chaque mois', prevu: Array(12).fill(1) },
+    { label: 'Chaque trimestre', prevu: Array.from({ length: 12 }, (_, i) => ((i + 1) % 3 === 0 ? 1 : 0)) },
+    { label: '2 fois par an', prevu: Array.from({ length: 12 }, (_, i) => ((i + 1) % 6 === 0 ? 1 : 0)) },
+    { label: 'Aucun mois', prevu: Array(12).fill(0) },
+  ];
+  const dupliquer = () => {
+    if (!draft) return;
+    const copie: Activite = { ...draft, id: thmService.newActiviteId(), titre: `${draft.titre} (copie)`, prevu: [...draft.prevu], manuel: Array(12).fill(0) };
+    setSel(copie.id);
+    setDraft(copie);
+    setIsNew(true);
   };
   const planPrecedent = thmService.hasPlan(annee - 1);
 
@@ -179,6 +225,18 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
               <span className="label-caps block mb-1">Activité</span>
               <input className={inputCls} value={draft.titre} onChange={(e) => setDraft({ ...draft, titre: e.target.value })} />
             </label>
+
+            <div>
+              <span className="label-caps block mb-1.5">Fréquence rapide</span>
+              <div className="flex flex-wrap gap-1.5">
+                {PRESETS.map((pr) => (
+                  <button key={pr.label} type="button" onClick={() => setDraft({ ...draft, prevu: [...pr.prevu] })} className="min-h-[36px] px-3 rounded-full border border-medium text-[13px] text-main active:bg-card-subtle">
+                    {pr.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[12px] text-sub mt-1.5">Choisis un rythme, puis ajuste mois par mois si besoin.</p>
+            </div>
 
             <div>
               <span className="label-caps block mb-1.5">Mois : prévu et réalisé</span>
@@ -217,6 +275,20 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
             </div>
 
             <label className="block">
+              <span className="label-caps block mb-1">Comment compter le « fait »</span>
+              <select
+                className={inputCls}
+                aria-label="Comment compter le fait"
+                value={draft.source || ''}
+                onChange={(e) => setDraft({ ...draft, source: (e.target.value || undefined) as SourceAuto | undefined })}
+              >
+                <option value="">Je le saisis moi-même</option>
+                {(Object.keys(SOURCE_LABEL) as SourceAuto[]).map((k) => (
+                  <option key={k} value={k}>Automatique : {SOURCE_LABEL[k]}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
               <span className="label-caps block mb-1">Responsable</span>
               <input className={inputCls} value={draft.responsable} onChange={(e) => setDraft({ ...draft, responsable: e.target.value })} />
             </label>
@@ -238,6 +310,11 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
             </label>
 
             <div className="flex gap-2 pt-1">
+              {!isNew && (
+                <button onClick={dupliquer} className="h-12 w-12 rounded-lg border border-medium text-main flex items-center justify-center" aria-label="Dupliquer l'activité">
+                  <Copy className="w-5 h-5" />
+                </button>
+              )}
               {!isNew && (
                 <button onClick={() => setConfirmDelete(true)} className="h-12 w-12 rounded-lg border border-medium text-danger flex items-center justify-center" aria-label="Supprimer l'activité">
                   <Trash2 className="w-5 h-5" />
@@ -431,6 +508,26 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
                   <button onClick={() => addActivite(axe)} className="mt-1 text-[13px] text-primary font-medium flex items-center gap-1 py-1.5">
                     <Plus className="w-4 h-4" /> Ajouter une activité
                   </button>
+                  {renAxe?.ancien === axe ? (
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        autoFocus
+                        className={inputCls}
+                        aria-label="Nouveau nom de l’axe"
+                        value={renAxe.valeur}
+                        onChange={(e) => setRenAxe({ ancien: axe, valeur: e.target.value })}
+                        onKeyDown={(e) => e.key === 'Enter' && renommerAxe()}
+                      />
+                      <button onClick={renommerAxe} className="px-4 rounded-lg bg-primary text-white dark:text-[#10201a] text-[14px] font-medium">OK</button>
+                    </div>
+                  ) : (
+                    <div className="mt-1 flex items-center gap-1 text-[12px] text-sub flex-wrap">
+                      <button onClick={() => setRenAxe({ ancien: axe, valeur: axe })} className="min-h-[36px] px-2.5 rounded-md border border-soft flex items-center gap-1.5"><Pencil className="w-3.5 h-3.5" /> Renommer l’axe</button>
+                      <button onClick={() => deplacerAxe(axe, -1)} aria-label="Monter l’axe" className="w-9 h-9 rounded-md border border-soft flex items-center justify-center"><ChevronUp className="w-4 h-4" /></button>
+                      <button onClick={() => deplacerAxe(axe, 1)} aria-label="Descendre l’axe" className="w-9 h-9 rounded-md border border-soft flex items-center justify-center"><ChevronDown className="w-4 h-4" /></button>
+                      <button onClick={() => setSupprAxe(axe)} className="min-h-[36px] px-2.5 rounded-md border border-soft text-danger flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5" /> Supprimer l’axe</button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -492,6 +589,14 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
         confirmLabel="Reprendre"
         onConfirm={() => { setPlan(thmService.copierPlan(annee - 1, annee)); setChoixPlan(null); setTick((t) => t + 1); }}
         onCancel={() => setChoixPlan(null)}
+      />
+      <ConfirmModal
+        isOpen={supprAxe !== null}
+        title="Supprimer cet axe ?"
+        message={`« ${supprAxe ?? ''} » et ses ${plan.activites.filter((a) => a.axe === supprAxe).length} activité(s) seront retirés du plan ${annee}. Les registres ne sont pas touchés.`}
+        confirmLabel="Supprimer"
+        onConfirm={supprimerAxe}
+        onCancel={() => setSupprAxe(null)}
       />
       <ConfirmModal
         isOpen={confirmDelete}
