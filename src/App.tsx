@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { UpdateBanner } from './components/UpdateBanner';
 import { useToast } from './context/ToastContext';
 import { STORAGE_ERROR_EVENT } from './utils/safeStorage';
 import { Header } from './components/Header';
@@ -378,6 +379,7 @@ export default function App() {
         <Suspense fallback={<p className="text-sub text-sm py-10 text-center" role="status">Chargement…</p>}>{renderView()}</Suspense>
       </main>
 
+      <UpdateBanner />
       <UrgenceAesModal isOpen={isAesOpen} onClose={() => setIsAesOpen(false)} />
       <GlossaireModal isOpen={isGlossaireOpen} onClose={() => setIsGlossaireOpen(false)} />
       <AProposModal isOpen={isAProposOpen} onClose={() => setIsAProposOpen(false)} />

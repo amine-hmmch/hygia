@@ -2,18 +2,20 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
+import { UPDATE_EVENT, setUpdater } from './components/UpdateBanner';
 
 // Register Service Worker for 100% offline PWA caching
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-  registerSW({
+  const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {
-      console.log('PWA: Mise à jour disponible.');
+      window.dispatchEvent(new Event(UPDATE_EVENT));
     },
     onOfflineReady() {
       console.log('PWA: Prêt pour fonctionnement hors-ligne.');
     },
   });
+  setUpdater(updateSW);
 }
 
 import { ThemeProvider } from './context/ThemeContext';
