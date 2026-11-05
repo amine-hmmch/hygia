@@ -33,7 +33,7 @@ export const PWAInstallButton: React.FC<{ compact?: boolean; label?: string }> =
         onClick={handleClick}
         className={`flex items-center gap-1.5 font-medium rounded-lg active:scale-95 transition shrink-0 ${
           compact
-            ? 'min-w-10 min-h-10 justify-center px-2.5 py-1.5 text-sm text-sub hover:text-main hover:bg-card-subtle'
+            ? 'min-w-11 min-h-11 justify-center px-2.5 py-1.5 text-sm text-sub hover:text-main hover:bg-card-subtle'
             : 'px-3.5 py-2 text-sm bg-primary text-white dark:text-[#10201a] hover:bg-primary-hover'
         }`}
         title="Installer l'application sur l'appareil pour un fonctionnement 100% hors-ligne"

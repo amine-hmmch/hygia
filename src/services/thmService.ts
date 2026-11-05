@@ -1,4 +1,4 @@
-import { PlanAnnuel, planParDefaut, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
+import { PlanAnnuel, planParDefaut, SOURCE_LABEL, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
 import { storageService } from './storageService';
 import { cuisineService } from './cuisineService';
 import { safeSetItem } from '../utils/safeStorage';
@@ -177,6 +177,58 @@ export const thmService = {
     write(planKey(versAnnee), plan);
     return plan;
   },
+  /** Fichier de partage : structure du plan seulement (pas le réalisé saisi, pas d'identité). */
+  exporterPlan(annee: number): string {
+    const p = this.getPlan(annee);
+    return JSON.stringify({
+      type: 'hygia-plan',
+      schemaVersion: 1,
+      annee: p.annee,
+      axes: p.axes,
+      activites: p.activites.map(({ axe, titre, outil, indicateur, responsable, prevu, source }) => ({ axe, titre, outil, indicateur, responsable, prevu, source })),
+    }, null, 2);
+  },
+  /** Importe un plan partagé dans l'année donnée. Validation stricte ; remplace le plan de cette année (copie de sécurité conservée). */
+  importerPlan(contenu: string, annee: number): { ok: boolean; message: string; nb?: number } {
+    let d: any;
+    try { d = JSON.parse(contenu); } catch { return { ok: false, message: "Ce fichier n'est pas lisible." }; }
+    if (!d || d.type !== 'hygia-plan' || !Array.isArray(d.activites)) return { ok: false, message: "Ce fichier n'est pas un plan Hygia." };
+    const txt = (v: unknown, max = 300) => (typeof v === 'string' ? v.slice(0, max) : '');
+    const sources = Object.keys(SOURCE_LABEL);
+    const activites: Activite[] = [];
+    for (const a of d.activites.slice(0, 200)) {
+      if (!a || typeof a !== 'object' || !txt(a.titre).trim()) continue;
+      const prevu = Array.isArray(a.prevu) && a.prevu.length === 12 ? a.prevu.map((n: unknown) => (Number.isFinite(n) && (n as number) >= 0 && (n as number) < 1000 ? Math.round(n as number) : 0)) : Array(12).fill(0);
+      activites.push({
+        id: `act_${uid()}`,
+        axe: txt(a.axe, 80) || 'Autres activités',
+        titre: txt(a.titre),
+        outil: txt(a.outil),
+        indicateur: txt(a.indicateur),
+        responsable: txt(a.responsable, 80),
+        prevu,
+        manuel: Array(12).fill(0),
+        source: sources.includes(a.source) ? a.source : undefined,
+      });
+    }
+    if (activites.length === 0) return { ok: false, message: 'Aucune activité valide dans ce fichier.' };
+    try {
+      const ancien = localStorage.getItem(planKey(annee));
+      if (ancien) localStorage.setItem(`${planKey(annee)}_avant_import`, ancien);
+    } catch { /* ignoré */ }
+    const axes = Array.isArray(d.axes) ? d.axes.filter((x: unknown) => typeof x === 'string').map((x: string) => x.slice(0, 80)) : undefined;
+    const axesDeduits = Array.from(new Set(activites.map((a) => a.axe)));
+    const plan: PlanAnnuel = {
+      annee,
+      activites,
+      axes: axes && axesDeduits.every((x) => axes.includes(x)) ? axes : axesDeduits,
+      suiviDepuis: annee === new Date().getFullYear() ? new Date().getMonth() : 0,
+      choisi: true,
+      updatedAt: new Date().toISOString(),
+    };
+    write(planKey(annee), plan);
+    return { ok: true, message: 'Plan importé.', nb: activites.length };
+  },
   resetPlan(annee: number): PlanAnnuel {
     const plan = planParDefaut(annee);
     write(planKey(annee), plan);
@@ -269,7 +321,7 @@ export const thmService = {
       const toRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i) || '';
-        if (/^essp_hygiene_plan_\d{4}_v1$/.test(k)) toRemove.push(k);
+        if (/^essp_hygiene_plan_\d{4}_v1(_avant_import)?$/.test(k)) toRemove.push(k);
       }
       toRemove.forEach((k) => localStorage.removeItem(k));
     } catch {}

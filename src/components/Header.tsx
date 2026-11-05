@@ -14,7 +14,7 @@ interface HeaderProps {
 }
 
 const ghostBtn =
-  'w-10 h-10 rounded-lg flex items-center justify-center text-sub hover:text-main hover:bg-card-subtle transition active:scale-95';
+  'w-11 h-11 rounded-lg flex items-center justify-center text-sub hover:text-main hover:bg-card-subtle transition active:scale-95';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenAPropos, onGoHome }) => {
   const isOnline = useOnlineStatus();
@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAPropos, onGoHome }) => {
           type="button"
           onClick={onGoHome}
           aria-label="Retour à l’accueil"
-          className="flex items-center gap-2.5 min-w-0 text-start rounded-lg -ms-1 ps-1 pe-2 py-1 active:opacity-70"
+          className="flex items-center gap-2.5 min-w-0 text-start rounded-lg -ms-1 ps-1 pe-2 py-1.5 min-h-[44px] active:opacity-70"
         >
           <AppLogo size={28} className="shrink-0" />
           <div className="min-w-0 leading-tight">

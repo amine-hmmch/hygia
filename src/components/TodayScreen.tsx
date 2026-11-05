@@ -153,7 +153,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
             </button>
           ))}
           {alertes.length > 2 && (
-            <button onClick={() => setToutesAlertes(!toutesAlertes)} className="text-[13px] text-primary font-medium py-1">
+            <button onClick={() => setToutesAlertes(!toutesAlertes)} className="text-[13px] text-primary font-medium min-h-[44px] flex items-center">
               {toutesAlertes ? 'Voir moins' : `Voir les ${alertes.length - 2} autre${alertes.length - 2 > 1 ? 's' : ''} alerte${alertes.length - 2 > 1 ? 's' : ''}`}
             </button>
           )}
@@ -184,10 +184,10 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
           ))
         )}
         <div className="pt-3 flex items-center justify-between gap-3">
-          <button onClick={onOpenJournal} className="text-[13px] text-primary font-medium flex items-center gap-1">
+          <button onClick={onOpenJournal} className="text-[13px] text-primary font-medium min-h-[44px] flex items-center gap-1">
             {taches.length > 4 ? `Voir les ${taches.length} tâches et le carnet` : 'Ouvrir le carnet de bord'} <ChevronRight className="w-4 h-4" />
           </button>
-          <button onClick={onAddTask} className="min-h-[40px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
+          <button onClick={onAddTask} className="min-h-[44px] px-3 rounded-lg border border-medium text-[13px] text-primary font-medium flex items-center gap-1.5">
             <Plus className="w-4 h-4" /> Ajouter une tâche
           </button>
         </div>
@@ -197,7 +197,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
       <section className="rise" style={{ animationDelay: '180ms' }}>
         <div className="flex items-baseline justify-between pb-2 border-b border-medium">
           <h3 className="label-caps">À faire en {NOMS_MOIS_LONGS[now.getMonth()]}</h3>
-          <button onClick={onOpenPlan} className="text-xs text-primary font-medium">Plan annuel</button>
+          <button onClick={onOpenPlan} className="text-xs text-primary font-medium min-h-[44px] px-2 -me-2 flex items-center">Plan annuel</button>
         </div>
         {plan.length === 0 ? (
           <p className="py-4 text-sm text-sub">Le plan du mois est à jour.</p>
@@ -210,7 +210,7 @@ export const TodayScreen: React.FC<Props> = ({ actions, onOpenJournal, onAddTask
               </button>
             ))}
             {plan.length > 2 && (
-              <button onClick={onOpenPlan} className="pt-2 text-[13px] text-primary font-medium">
+              <button onClick={onOpenPlan} className="text-[13px] text-primary font-medium min-h-[44px] flex items-center">
                 + {plan.length - 2} autre{plan.length - 2 > 1 ? 's' : ''} activité{plan.length - 2 > 1 ? 's' : ''}
               </button>
             )}

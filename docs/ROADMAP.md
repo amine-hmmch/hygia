@@ -6,10 +6,10 @@
 - [fait] Import de sauvegarde sans confirmation ni copie de sécurité.
 
 ## Améliorations importantes
-- Mise à jour PWA silencieuse : proposer « Nouvelle version disponible » (main.tsx, onNeedRefresh).
-- Export/import du plan annuel entre collègues.
+- [fait] Bandeau « Nouvelle version disponible » (UpdateBanner).
+- [fait] Export/import du plan annuel entre collègues (structure seulement, validation stricte, copie de sécurité).
 - Tests automatisés (Playwright) dans le dépôt pour les parcours critiques.
-- Zones tactiles < 44 px (liens « Voir tout », « Ajouter »).
+- [fait pour l'en-tête et l'accueil] Zones tactiles < 44 px ; reste à scanner les écrans internes.
 
 ## Fonctionnalités essentielles manquantes
 - Niveaux district / GST / centre de santé (en attente des documents du terrain).

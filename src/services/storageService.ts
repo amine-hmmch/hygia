@@ -784,6 +784,7 @@ export const storageService = {
       localStorage.removeItem(AUDITS_STORAGE_KEY);
       localStorage.removeItem(ACTIONS_STORAGE_KEY);
       localStorage.removeItem(AUDIT_DRAFT_KEY);
+      localStorage.removeItem('essp_hygiene_pre_import_backup');
       localStorage.removeItem(STERILISATION_STORAGE_KEY);
       localStorage.removeItem(DECHETS_STORAGE_KEY);
       localStorage.removeItem(CUISINE_RELEVES_KEY);

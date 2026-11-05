@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Plus, Minus, Printer, X, Trash2, RotateCcw, Copy, Pencil } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Plus, Minus, Printer, Download, Upload, X, Trash2, RotateCcw, Copy, Pencil } from 'lucide-react';
 import { AXES, Activite, PlanAnnuel, NOMS_MOIS, NOMS_MOIS_LONGS, SOURCE_LABEL, SourceAuto } from '../data/thmData';
 import { thmService } from '../services/thmService';
 import { storageService } from '../services/storageService';
 import { ConfirmModal } from './ConfirmModal';
 import { APP_NAME } from '../config/app';
+import { useToast } from '../context/ToastContext';
 
 const inputCls =
   'w-full min-h-[44px] px-3 py-2 rounded-lg bg-card border border-medium text-main text-[15px] focus:outline-none focus:border-primary';
@@ -31,6 +32,39 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
   const [renAxe, setRenAxe] = useState<{ ancien: string; valeur: string } | null>(null);
   const [supprAxe, setSupprAxe] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
+  const { showToast } = useToast();
+  const fichierRef = React.useRef<HTMLInputElement>(null);
+  const [importEnAttente, setImportEnAttente] = useState<string | null>(null);
+
+  const exporterPlan = () => {
+    const blob = new Blob([thmService.exporterPlan(annee)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Hygia_plan_${annee}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Plan exporté (sans tes chiffres saisis)', 'success');
+  };
+  const choisirFichier = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => setImportEnAttente(String(r.result ?? ''));
+    r.readAsText(f);
+    e.target.value = '';
+  };
+  const confirmerImport = () => {
+    const res = thmService.importerPlan(importEnAttente ?? '', annee);
+    setImportEnAttente(null);
+    if (res.ok) {
+      setPlan(thmService.getPlan(annee));
+      setTick((t) => t + 1);
+      showToast(`Plan importé : ${res.nb} activités`, 'success');
+    } else showToast(res.message, 'error');
+  };
 
   useEffect(() => setPlan(thmService.getPlan(annee)), [annee]);
   useEffect(() => {
@@ -403,7 +437,14 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
           <h2 className="text-lg font-semibold text-main leading-tight">Plan d’action annuel</h2>
           <p className="text-[13px] text-sub leading-tight">Ton programme d’activités, mois par mois</p>
         </div>
-        <button onClick={() => setPrinting(true)} className="w-10 h-10 flex items-center justify-center text-sub" aria-label="Imprimer le plan">
+        <input ref={fichierRef} type="file" accept=".json,application/json" className="hidden" onChange={choisirFichier} />
+        <button onClick={exporterPlan} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Exporter mon plan">
+          <Download className="w-5 h-5" />
+        </button>
+        <button onClick={() => fichierRef.current?.click()} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Importer un plan">
+          <Upload className="w-5 h-5" />
+        </button>
+        <button onClick={() => setPrinting(true)} className="w-11 h-11 flex items-center justify-center text-sub" aria-label="Imprimer le plan">
           <Printer className="w-5 h-5" />
         </button>
       </div>
@@ -581,6 +622,15 @@ export const PlanAnnuelModule: React.FC<{ onBackToHome: () => void; onOpenRegist
         confirmLabel="Plan vide"
         onConfirm={() => { setPlan(thmService.planVide(annee)); setChoixPlan(null); setTick((t) => t + 1); }}
         onCancel={() => setChoixPlan(null)}
+      />
+      <ConfirmModal
+        isOpen={importEnAttente !== null}
+        title={`Importer ce plan dans ${annee} ?`}
+        message={`Le plan ${annee} actuel est remplacé par celui du fichier (une copie de sécurité est gardée sur l'appareil). Tes chiffres saisis à la main ne sont pas repris.`}
+        confirmLabel="Importer"
+        isDestructive={true}
+        onConfirm={confirmerImport}
+        onCancel={() => setImportEnAttente(null)}
       />
       <ConfirmModal
         isOpen={choixPlan === 'copie'}
