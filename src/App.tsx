@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { useToast } from './context/ToastContext';
+import { STORAGE_ERROR_EVENT } from './utils/safeStorage';
 import { Header } from './components/Header';
 import { BottomNav, NavTab } from './components/BottomNav';
 import { TodayScreen } from './components/TodayScreen';
@@ -15,15 +17,15 @@ import { AuditRunner } from './components/AuditRunner';
 import { AuditDetailView } from './components/AuditDetailView';
 import { AuditHistory } from './components/AuditHistory';
 import { CorrectiveActionsList } from './components/CorrectiveActionsList';
-import { FichesView } from './components/FichesView';
-import { SterilisationModule } from './components/SterilisationModule';
-import { DechetsModule } from './components/DechetsModule';
-import { TableauDeBordModule } from './components/TableauDeBordModule';
+const FichesView = lazy(() => import('./components/FichesView').then((m) => ({ default: m.FichesView })));
+const SterilisationModule = lazy(() => import('./components/SterilisationModule').then((m) => ({ default: m.SterilisationModule })));
+const DechetsModule = lazy(() => import('./components/DechetsModule').then((m) => ({ default: m.DechetsModule })));
+const TableauDeBordModule = lazy(() => import('./components/TableauDeBordModule').then((m) => ({ default: m.TableauDeBordModule })));
 import { PlanAnnuelModule } from './components/PlanAnnuelModule';
 import { RegistresModule } from './components/RegistresModule';
 import { JournalModule } from './components/JournalModule';
-import { CuisineModule } from './components/CuisineModule';
-import { RapportMensuelModal } from './components/RapportMensuelModal';
+const CuisineModule = lazy(() => import('./components/CuisineModule').then((m) => ({ default: m.CuisineModule })));
+const RapportMensuelModal = lazy(() => import('./components/RapportMensuelModal').then((m) => ({ default: m.RapportMensuelModal })));
 import { UrgenceAesModal } from './components/UrgenceAesModal';
 import { GlossaireModal } from './components/GlossaireModal';
 import { AProposModal } from './components/AProposModal';
@@ -56,6 +58,7 @@ type View =
 const TUTORIAL_KEY = 'essp_hygiene_tutorial_v1';
 
 export default function App() {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<NavTab>('accueil');
   const [currentView, setCurrentView] = useState<View>('home');
   const [registreId, setRegistreId] = useState<RegistreId>('eau');
@@ -90,6 +93,13 @@ export default function App() {
   const [auditVersion, setAuditVersion] = useState<ChecklistVersion>('courte');
   const [focusComponent, setFocusComponent] = useState<string | undefined>(undefined);
   const [auditServiceTarget, setAuditServiceTarget] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const onStorageError = () =>
+      showToast("Enregistrement impossible : mémoire de l'appareil pleine. Faites une sauvegarde et libérez de l'espace.", 'error');
+    window.addEventListener(STORAGE_ERROR_EVENT, onStorageError);
+    return () => window.removeEventListener(STORAGE_ERROR_EVENT, onStorageError);
+  }, []);
 
   useEffect(() => {
     storageService.seedInitialDataIfEmpty();
@@ -364,12 +374,18 @@ export default function App() {
         onGoHome={() => handleTabChange('accueil')}
       />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 safe-bottom">{renderView()}</main>
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 pt-4 safe-bottom">
+        <Suspense fallback={<p className="text-sub text-sm py-10 text-center" role="status">Chargement…</p>}>{renderView()}</Suspense>
+      </main>
 
       <UrgenceAesModal isOpen={isAesOpen} onClose={() => setIsAesOpen(false)} />
       <GlossaireModal isOpen={isGlossaireOpen} onClose={() => setIsGlossaireOpen(false)} />
       <AProposModal isOpen={isAProposOpen} onClose={() => setIsAProposOpen(false)} />
-      <RapportMensuelModal isOpen={isRapportOpen} onClose={() => setIsRapportOpen(false)} />
+      {isRapportOpen && (
+        <Suspense fallback={null}>
+          <RapportMensuelModal isOpen={isRapportOpen} onClose={() => setIsRapportOpen(false)} />
+        </Suspense>
+      )}
       <OnboardingModal
         isOpen={isOnboardingOpen}
         onComplete={() => {

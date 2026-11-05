@@ -8,6 +8,7 @@ import { PRIORITE_LABEL } from '../data/planActionData';
 import { APP_NAME } from '../config/app';
 import { thmService } from '../services/thmService';
 import { REGISTRES, RegistreId } from '../data/thmData';
+import { dateLocale } from '../utils/dates';
 
 interface Props {
   isOpen: boolean;
@@ -63,7 +64,7 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
     const journalJours = Object.keys(thmService.getJours()).filter((d) => inMonth(d));
     const audits = storageService.getAudits().filter((a) => inMonth(a.date));
     const allActions = storageService.getCorrectiveActions();
-    const today = new Date().toISOString().split('T')[0];
+    const today = dateLocale();
     const ouvertes = allActions.filter((a) => a.statut === 'a_faire' || a.statut === 'en_cours');
     const enRetard = ouvertes.filter((a) => a.echeance < today);
     const cloturees = allActions.filter((a) => (a.statut === 'realise' || a.statut === 'verifie') && inMonth((a.updatedAt || a.createdAt).slice(0, 10)));
@@ -251,7 +252,7 @@ export const RapportMensuelModal: React.FC<Props> = ({ isOpen, onClose, defaultM
                   <p className="text-[12px] text-sub mt-0.5">
                     {a.priorite ? `Priorité ${PRIORITE_LABEL[a.priorite].toLowerCase()} · ` : ''}
                     {a.responsable} · avant le {fmt(a.echeance)}
-                    {a.echeance < new Date().toISOString().split('T')[0] ? ' · EN RETARD' : ''} · {STATUT[a.statut]}
+                    {a.echeance < dateLocale() ? ' · EN RETARD' : ''} · {STATUT[a.statut]}
                   </p>
                 </div>
               ))

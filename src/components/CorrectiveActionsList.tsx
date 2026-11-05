@@ -20,6 +20,7 @@ import { ActionEditModal } from './ActionEditModal';
 import { PRIORITE_LABEL } from '../data/planActionData';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 interface CorrectiveActionsListProps {
   actions: CorrectiveAction[];
@@ -75,7 +76,7 @@ export const CorrectiveActionsList: React.FC<CorrectiveActionsListProps> = ({
   const [editingAction, setEditingAction] = useState<CorrectiveAction | null>(null);
   const [actionToDelete, setActionToDelete] = useState<CorrectiveAction | null>(null);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = dateLocale();
 
   // Distinct services in actions
   const actionServices = useMemo(() => {

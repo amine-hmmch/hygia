@@ -1,3 +1,4 @@
+import { safeSetItem } from '../utils/safeStorage';
 /** Sauvegarde, CSV, rappels : petits utilitaires partagés. */
 import { thmService, debutSemaine } from './thmService';
 
@@ -14,7 +15,7 @@ const get = (k: string) => {
 };
 const set = (k: string, v: string) => {
   try {
-    localStorage.setItem(k, v);
+    safeSetItem(k, v);
   } catch {}
 };
 

@@ -9,6 +9,7 @@ import { extrasService } from '../services/extrasService';
 import { addDays } from '../data/planActionData';
 import { CorrectiveAction } from '../types';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 const ICONES: Record<RegistreId, React.ElementType> = {
   eau: Droplets,
@@ -18,7 +19,7 @@ const ICONES: Record<RegistreId, React.ElementType> = {
 };
 const TONES: Record<RegistreId, string> = { eau: 'sea', vecteurs: 'clay', prelevements: 'plum', sensibilisation: 'ochre' };
 
-const today = () => new Date().toISOString().split('T')[0];
+const today = () => dateLocale();
 const nowTime = () => new Date().toTimeString().slice(0, 5);
 const fmt = (d: string) => (d ? d.split('-').reverse().join('/') : '');
 

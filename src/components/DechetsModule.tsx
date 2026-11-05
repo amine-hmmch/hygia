@@ -33,6 +33,7 @@ import {
 } from '../data/dechetsData';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 interface DechetsModuleProps {
   onBackToHome: () => void;
@@ -146,7 +147,7 @@ export const DechetsModule: React.FC<DechetsModuleProps> = ({ onBackToHome }) =>
   const [peseeToPrint, setPeseeToPrint] = useState<DechetPesee | null>(null);
 
   // Form state
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = dateLocale();
   const nowTimeStr = new Date().toTimeString().slice(0, 5);
   const settings = storageService.getSettings();
   const defaultAuditeur = settings.userName || settings.auditeurDefaut || 'Technicien d’hygiène';

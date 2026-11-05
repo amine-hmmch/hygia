@@ -14,6 +14,8 @@ import { validateCycleParameters, PROGRAMMES_GUIDE } from '../data/sterilisation
 import { getRecommandation, addDays } from '../data/planActionData';
 import { thmService } from './thmService';
 import { CUISINE_RELEVES_KEY, CUISINE_AUDITS_KEY, cuisineService } from './cuisineService';
+import { dateLocale } from '../utils/dates';
+import { safeSetItem } from '../utils/safeStorage';
 
 const AUDITS_STORAGE_KEY = 'essp_hygiene_audits_v1';
 const ACTIONS_STORAGE_KEY = 'essp_hygiene_actions_v1';
@@ -84,7 +86,7 @@ export const storageService = {
 
   saveSettings(settings: AppSettings): void {
     try {
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+      safeSetItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (e) {
       console.error('Failed to save settings to localStorage', e);
     }
@@ -107,7 +109,7 @@ export const storageService = {
 
   setOnboardingCompleted(): void {
     try {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+      safeSetItem(ONBOARDING_STORAGE_KEY, 'true');
     } catch (e) {
       console.error('Failed to save onboarding state', e);
     }
@@ -122,7 +124,7 @@ export const storageService = {
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Migration unique : « Bloc Opératoire » ajouté à la liste type, on l'insère dans les listes déjà enregistrées.
           if (!localStorage.getItem('essp_hygiene_svc_bloc_v1')) {
-            localStorage.setItem('essp_hygiene_svc_bloc_v1', '1');
+            safeSetItem('essp_hygiene_svc_bloc_v1', '1');
             if (!parsed.some((x: string) => /bloc/i.test(x))) {
               const i = parsed.indexOf('Salle d’Accouchement');
               const maj = i >= 0 ? [...parsed.slice(0, i + 1), 'Bloc Opératoire', ...parsed.slice(i + 1)] : [...parsed, 'Bloc Opératoire'];
@@ -141,7 +143,7 @@ export const storageService = {
 
   saveServices(services: string[]): void {
     try {
-      localStorage.setItem(SERVICES_STORAGE_KEY, JSON.stringify(services));
+      safeSetItem(SERVICES_STORAGE_KEY, JSON.stringify(services));
     } catch (e) {
       console.error('Failed to save services', e);
     }
@@ -184,7 +186,7 @@ export const storageService = {
     const map = this.getServicePeriodicities();
     map[service] = periodicite;
     try {
-      localStorage.setItem(PERIODICITIES_STORAGE_KEY, JSON.stringify(map));
+      safeSetItem(PERIODICITIES_STORAGE_KEY, JSON.stringify(map));
     } catch (e) {
       console.error('Failed to save service periodicity', e);
     }
@@ -216,7 +218,7 @@ export const storageService = {
       const latestAudit = serviceAudits.length > 0 ? serviceAudits[0] : null;
 
       if (!latestAudit) {
-        const nextDateStr = today.toISOString().split('T')[0];
+        const nextDateStr = dateLocale(today);
         const res: ServiceAuditReminder = {
           service,
           periodicite,
@@ -252,7 +254,7 @@ export const storageService = {
         periodiciteJours: daysInterval,
         derniereDateAudit: latestAudit.date,
         dernierScore: latestAudit.scoreGlobal,
-        prochaineDateAudit: nextAuditDate.toISOString().split('T')[0],
+        prochaineDateAudit: dateLocale(nextAuditDate),
         statut,
         joursRestants: diffDays,
       };
@@ -278,7 +280,7 @@ export const storageService = {
       updated = [...favs, ficheId];
     }
     try {
-      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(updated));
+      safeSetItem(FAVORITES_STORAGE_KEY, JSON.stringify(updated));
     } catch (e) {
       console.error('Failed to save favorites', e);
     }
@@ -304,7 +306,7 @@ export const storageService = {
       });
       if (changed) {
         try {
-          localStorage.setItem(AUDITS_STORAGE_KEY, JSON.stringify(parsed));
+          safeSetItem(AUDITS_STORAGE_KEY, JSON.stringify(parsed));
         } catch {}
       }
       return parsed.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -404,7 +406,7 @@ export const storageService = {
     }
 
     try {
-      localStorage.setItem(AUDITS_STORAGE_KEY, JSON.stringify(audits));
+      safeSetItem(AUDITS_STORAGE_KEY, JSON.stringify(audits));
     } catch (e) {
       console.error('Failed to save audit to localStorage', e);
     }
@@ -426,7 +428,7 @@ export const storageService = {
   },
   saveAuditDraft(d: AuditDraft): void {
     try {
-      localStorage.setItem(AUDIT_DRAFT_KEY, JSON.stringify(d));
+      safeSetItem(AUDIT_DRAFT_KEY, JSON.stringify(d));
     } catch (e) {
       console.error('Failed to save audit draft', e);
     }
@@ -440,7 +442,7 @@ export const storageService = {
   deleteAudit(id: string): void {
     const audits = this.getAudits().filter((a) => a.id !== id);
     try {
-      localStorage.setItem(AUDITS_STORAGE_KEY, JSON.stringify(audits));
+      safeSetItem(AUDITS_STORAGE_KEY, JSON.stringify(audits));
     } catch (e) {
       console.error('Failed to delete audit', e);
     }
@@ -448,7 +450,7 @@ export const storageService = {
     // Also remove associated actions
     const actions = this.getCorrectiveActions().filter((act) => act.auditId !== id);
     try {
-      localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
+      safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
     } catch (e) {
       console.error('Failed to delete associated actions', e);
     }
@@ -481,7 +483,7 @@ export const storageService = {
     }
 
     try {
-      localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
+      safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
     } catch (e) {
       console.error('Failed to save action', e);
     }
@@ -496,7 +498,7 @@ export const storageService = {
       target.statut = statut;
       target.updatedAt = new Date().toISOString();
       try {
-        localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
+        safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
       } catch (e) {
         console.error('Failed to update action status', e);
       }
@@ -506,7 +508,7 @@ export const storageService = {
   deleteCorrectiveAction(actionId: string): void {
     const actions = this.getCorrectiveActions().filter((a) => a.id !== actionId);
     try {
-      localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
+      safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(actions));
     } catch (e) {
       console.error('Failed to delete action', e);
     }
@@ -564,7 +566,7 @@ export const storageService = {
     }
 
     try {
-      localStorage.setItem(STERILISATION_STORAGE_KEY, JSON.stringify(cycles));
+      safeSetItem(STERILISATION_STORAGE_KEY, JSON.stringify(cycles));
     } catch (e) {
       console.error('Failed to save sterilisation cycle', e);
     }
@@ -575,7 +577,7 @@ export const storageService = {
   deleteSterilisationCycle(id: string): void {
     const cycles = this.getSterilisationCycles().filter((c) => c.id !== id);
     try {
-      localStorage.setItem(STERILISATION_STORAGE_KEY, JSON.stringify(cycles));
+      safeSetItem(STERILISATION_STORAGE_KEY, JSON.stringify(cycles));
     } catch (e) {
       console.error('Failed to delete sterilisation cycle', e);
     }
@@ -620,7 +622,7 @@ export const storageService = {
     }
 
     try {
-      localStorage.setItem(DECHETS_STORAGE_KEY, JSON.stringify(list));
+      safeSetItem(DECHETS_STORAGE_KEY, JSON.stringify(list));
     } catch (e) {
       console.error('Failed to save dechet pesee', e);
     }
@@ -631,7 +633,7 @@ export const storageService = {
   deleteDechetPesee(id: string): void {
     const list = this.getDechetsPesees().filter((p) => p.id !== id);
     try {
-      localStorage.setItem(DECHETS_STORAGE_KEY, JSON.stringify(list));
+      safeSetItem(DECHETS_STORAGE_KEY, JSON.stringify(list));
     } catch (e) {
       console.error('Failed to delete dechet pesee', e);
     }
@@ -694,7 +696,7 @@ export const storageService = {
 
     const merged = [...otherAuditActions, ...updatedCurrentAuditActions];
     try {
-      localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(merged));
+      safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(merged));
     } catch (e) {
       console.error('Failed to synchronize actions', e);
     }
@@ -703,8 +705,9 @@ export const storageService = {
   // Export / Import
   exportFullBackup(): string {
     const backup = {
-      app: 'ESSP Sécurité Sanitaire - Ministère de la Santé Maroc',
+      app: 'Hygia',
       version: '1.0.0',
+      schemaVersion: 1,
       exportedAt: new Date().toISOString(),
       audits: this.getAudits(),
       correctiveActions: this.getCorrectiveActions(),
@@ -725,31 +728,39 @@ export const storageService = {
       if (!data || typeof data !== 'object') {
         return { success: false, message: 'Fichier JSON invalide' };
       }
+      const connu = ['audits', 'correctiveActions', 'sterilisationCycles', 'dechetsPesees', 'cuisineReleves', 'cuisineAudits', 'thm', 'services', 'settings'];
+      if (!connu.some((k) => k in data)) {
+        return { success: false, message: "Ce fichier n'est pas une sauvegarde Hygia." };
+      }
+      // Copie de sécurité des données actuelles avant écrasement (restaurable manuellement)
+      try {
+        localStorage.setItem('essp_hygiene_pre_import_backup', this.exportFullBackup());
+      } catch { /* mémoire pleine : on continue, l'utilisateur a confirmé */ }
 
       if (Array.isArray(data.audits)) {
-        localStorage.setItem(AUDITS_STORAGE_KEY, JSON.stringify(data.audits));
+        safeSetItem(AUDITS_STORAGE_KEY, JSON.stringify(data.audits));
       }
       if (Array.isArray(data.correctiveActions)) {
-        localStorage.setItem(ACTIONS_STORAGE_KEY, JSON.stringify(data.correctiveActions));
+        safeSetItem(ACTIONS_STORAGE_KEY, JSON.stringify(data.correctiveActions));
       }
       if (Array.isArray(data.sterilisationCycles)) {
-        localStorage.setItem(STERILISATION_STORAGE_KEY, JSON.stringify(data.sterilisationCycles));
+        safeSetItem(STERILISATION_STORAGE_KEY, JSON.stringify(data.sterilisationCycles));
       }
       if (Array.isArray(data.dechetsPesees)) {
-        localStorage.setItem(DECHETS_STORAGE_KEY, JSON.stringify(data.dechetsPesees));
+        safeSetItem(DECHETS_STORAGE_KEY, JSON.stringify(data.dechetsPesees));
       }
       if (Array.isArray(data.cuisineReleves)) {
-        localStorage.setItem(CUISINE_RELEVES_KEY, JSON.stringify(data.cuisineReleves));
+        safeSetItem(CUISINE_RELEVES_KEY, JSON.stringify(data.cuisineReleves));
       }
       if (Array.isArray(data.cuisineAudits)) {
-        localStorage.setItem(CUISINE_AUDITS_KEY, JSON.stringify(data.cuisineAudits));
+        safeSetItem(CUISINE_AUDITS_KEY, JSON.stringify(data.cuisineAudits));
       }
       if (data.thm) thmService.importAll(data.thm);
       if (Array.isArray(data.services)) {
-        localStorage.setItem(SERVICES_STORAGE_KEY, JSON.stringify(data.services));
+        safeSetItem(SERVICES_STORAGE_KEY, JSON.stringify(data.services));
       }
       if (data.settings && typeof data.settings === 'object') {
-        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data.settings));
+        safeSetItem(SETTINGS_STORAGE_KEY, JSON.stringify(data.settings));
       }
 
       return {
@@ -789,7 +800,7 @@ export const storageService = {
     const settings = this.getSettings();
     const etablissementName = settings.etablissement || '';
     const auditeurName = settings.userName || settings.auditeurDefaut || 'Auditeur';
-    const today = new Date().toISOString().split('T')[0];
+    const today = dateLocale();
 
     const initialResponses: Record<string, AuditItemResponse> = {
       c_env_1: { itemId: 'c_env_1', value: 'oui', observation: '2 passages par jour effectués' },
@@ -855,7 +866,7 @@ export const storageService = {
     });
 
     // Pesées déchets exemple
-    const formatDate = (d: Date) => d.toISOString().split('T')[0];
+    const formatDate = (d: Date) => dateLocale(d);
     const d0 = new Date();
     const d1 = new Date();
     d1.setDate(d1.getDate() - 1);

@@ -242,7 +242,7 @@ export const AuditDetailView: React.FC<AuditDetailViewProps> = ({
                     : 'Non conforme aux normes'}
                 </h3>
                 <p className="text-xs text-sub mt-1">
-                  Évaluation basée sur les règles d'hygiène du Ministère de la Santé (2021)
+                  Évaluation indicative, inspirée des guides d'hygiène hospitalière (Ministère de la Santé) — à valider par le technicien
                 </p>
               </div>
             </div>

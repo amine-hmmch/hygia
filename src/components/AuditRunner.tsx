@@ -30,6 +30,7 @@ import { Audit, ChecklistVersion, ComplianceValue, AuditItemResponse, ActionStat
 import { getChecklist, getAllItemsForVersion } from '../data/checklistsData';
 import { storageService } from '../services/storageService';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 interface AuditRunnerProps {
   initialAudit?: Audit | null;
@@ -103,7 +104,7 @@ export const AuditRunner: React.FC<AuditRunnerProps> = ({
   const [showAddService, setShowAddService] = useState(false);
 
   const [date, setDate] = useState<string>(
-    src?.date || new Date().toISOString().split('T')[0]
+    src?.date || dateLocale()
   );
   const [auditeur, setAuditeur] = useState<string>(
     src?.auditeur || settings.userName || settings.auditeurDefaut || ''

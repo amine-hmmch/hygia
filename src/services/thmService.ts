@@ -1,6 +1,7 @@
 import { PlanAnnuel, planParDefaut, RegistreId, SourceAuto, Activite, TacheJournal, TACHES_PAR_DEFAUT } from '../data/thmData';
 import { storageService } from './storageService';
 import { cuisineService } from './cuisineService';
+import { safeSetItem } from '../utils/safeStorage';
 
 export interface RegistreEntree {
   id: string;
@@ -24,7 +25,7 @@ function read<T>(key: string, fallback: T): T {
 }
 function write(key: string, value: unknown) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    safeSetItem(key, JSON.stringify(value));
   } catch (e) {
     console.error('Stockage impossible', e);
   }

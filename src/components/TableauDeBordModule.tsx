@@ -20,6 +20,7 @@ import { SterilisationIcon } from './AppMaskedIcons';
 import { Audit, CorrectiveAction, SterilisationCycle, DechetPesee } from '../types';
 import { storageService } from '../services/storageService';
 import { RapportMensuelModal } from './RapportMensuelModal';
+import { dateLocale } from '../utils/dates';
 
 interface TableauDeBordModuleProps {
   onBackToHome: () => void;
@@ -104,7 +105,7 @@ export const TableauDeBordModule: React.FC<TableauDeBordModuleProps> = ({
   // Actions breakdown
   const actionsEnRetard = actions.filter((a) => {
     if (a.statut === 'realise' || a.statut === 'verifie') return false;
-    const today = new Date().toISOString().split('T')[0];
+    const today = dateLocale();
     return a.echeance < today;
   });
 

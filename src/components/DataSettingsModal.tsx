@@ -21,6 +21,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { RappelsPanel } from './RappelsPanel';
 import { extrasService } from '../services/extrasService';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 interface DataSettingsModalProps {
   onDataChanged: () => void;
@@ -45,6 +46,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
   // Confirm modals
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [pendingImport, setPendingImport] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,7 +88,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    const dateStr = new Date().toISOString().split('T')[0];
+    const dateStr = dateLocale();
     link.href = url;
     link.download = `Hygia_Sauvegarde_${dateStr}.json`;
     document.body.appendChild(link);
@@ -105,7 +107,17 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
-      if (content) {
+      if (content) setPendingImport(content);
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleConfirmImport = () => {
+    const content = pendingImport;
+    setPendingImport(null);
+    if (content) {
+      {
         const res = storageService.importFullBackup(content);
         if (res.success) {
           setImportStatus({
@@ -124,9 +136,7 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
           showToast('Erreur lors de l’importation', 'error');
         }
       }
-    };
-    reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   // Reset / Clear all data
@@ -428,6 +438,17 @@ export const DataSettingsModal: React.FC<DataSettingsModalProps> = ({
       />
 
       {/* Clear Confirmation Modal */}
+      <ConfirmModal
+        isOpen={pendingImport !== null}
+        title="Remplacer les données actuelles ?"
+        message="L'importation remplace les données de cet appareil par celles du fichier. Une copie de sécurité des données actuelles est conservée sur l'appareil. Continuer ?"
+        confirmLabel="Importer"
+        cancelLabel="Annuler"
+        isDestructive={true}
+        onConfirm={handleConfirmImport}
+        onCancel={() => setPendingImport(null)}
+      />
+
       <ConfirmModal
         isOpen={showResetConfirm}
         title="Effacer toutes les données ?"

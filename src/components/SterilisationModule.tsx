@@ -31,6 +31,7 @@ import {
 import { storageService } from '../services/storageService';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 interface SterilisationModuleProps {
   onBackToHome?: () => void;
@@ -55,7 +56,7 @@ export const SterilisationModule: React.FC<SterilisationModuleProps> = ({ onBack
   const [selectedCycleForPrint, setSelectedCycleForPrint] = useState<SterilisationCycle | null>(null);
 
   // Form State
-  const today = new Date().toISOString().split('T')[0];
+  const today = dateLocale();
   const currentTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
   const [formDate, setFormDate] = useState<string>(today);

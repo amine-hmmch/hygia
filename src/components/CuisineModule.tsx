@@ -29,10 +29,11 @@ import { getRecommandation, addDays, PRIORITE_LABEL } from '../data/planActionDa
 import { CorrectiveAction } from '../types';
 import { ConfirmModal } from './ConfirmModal';
 import { useToast } from '../context/ToastContext';
+import { dateLocale } from '../utils/dates';
 
 type Tab = 'releves' | 'audit' | 'fiches';
 
-const today = () => new Date().toISOString().split('T')[0];
+const today = () => dateLocale();
 const nowTime = () => new Date().toTimeString().slice(0, 5);
 const fmtDate = (d: string) => {
   const [y, m, j] = d.split('-');

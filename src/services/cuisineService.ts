@@ -1,3 +1,4 @@
+import { safeSetItem } from '../utils/safeStorage';
 export interface CuisineReleve {
   id: string;
   date: string; // YYYY-MM-DD
@@ -41,7 +42,7 @@ function read<T>(key: string): T[] {
 }
 function write(key: string, value: unknown) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    safeSetItem(key, JSON.stringify(value));
   } catch (e) {
     console.error('Stockage impossible', e);
   }
